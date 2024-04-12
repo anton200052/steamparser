@@ -1,5 +1,6 @@
 package me.vasylkov.steamparser.telegram.configuration;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,14 +10,14 @@ import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 @Configuration
+@RequiredArgsConstructor
 public class TelegramClientConfiguration
 {
-    @Value("${telegram_bot_token}")
-    private String botToken;
+    private final TelegramProperties properties;
 
     @Bean
     public TelegramClient telegramClient()
     {
-        return new OkHttpTelegramClient(botToken);
+        return new OkHttpTelegramClient(properties.getBotToken());
     }
 }

@@ -1,5 +1,0 @@
-2024-04-08 00:43:55 [main] INFO  m.v.s.SteamparserApplication - Starting SteamparserApplication using Java 21.0.2 with PID 16280 (C:\Users\neatr\OneDrive\Рабочий стол\steamparser\target\classes started by neatr in C:\Users\neatr\OneDrive\Рабочий стол\steamparser)
-2024-04-08 00:43:55 [main] INFO  m.v.s.SteamparserApplication - No active profile set, falling back to 1 default profile: "default"
-2024-04-08 00:43:55 [main] INFO  m.v.s.t.c.TelegramClientConfiguration - Telegram bot token: 7109677466:AAF3pF_9Y2t55jG3KBgYYHHDBK_pR6v9ufo
-2024-04-08 00:43:56 [main] INFO  o.t.t.longpolling.BotSession - Result when calling deleteWebhook: true
-2024-04-08 00:43:56 [main] INFO  m.v.s.SteamparserApplication - Started SteamparserApplication in 1.844 seconds (process running for 2.501)
