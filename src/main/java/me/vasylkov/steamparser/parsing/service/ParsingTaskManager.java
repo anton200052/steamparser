@@ -27,7 +27,7 @@ public class ParsingTaskManager
         dataInitializer.init();
         while (!itemsStorage.isEmpty())
         {
-            parsingService.parsePage(itemsStorage.getNext());
+            parsingService.parseItemPage(itemsStorage.getNext());
         }
     }
 

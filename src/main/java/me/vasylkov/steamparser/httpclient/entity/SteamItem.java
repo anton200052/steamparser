@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.httpclient.object;
+package me.vasylkov.steamparser.httpclient.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,11 +10,11 @@ import me.vasylkov.steamparser.jackson.PriceDeserializer;
 @RequiredArgsConstructor
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Item
+public class SteamItem
 {
     @JsonProperty("median_price")
-    @JsonDeserialize(using = PriceDeserializer.class) // Используйте ваш десериализатор здесь
+    @JsonDeserialize(using = PriceDeserializer.class)
     private Double medianPrice;
-    private String name;
+    private String hashName;
     private String url;
 }

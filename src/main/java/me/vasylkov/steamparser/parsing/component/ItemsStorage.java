@@ -2,7 +2,7 @@ package me.vasylkov.steamparser.parsing.component;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.httpclient.object.Item;
+import me.vasylkov.steamparser.httpclient.entity.SteamItem;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.BlockingQueue;
@@ -13,7 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Data
 public class ItemsStorage
 {
-    private BlockingQueue<Item> queue = new LinkedBlockingQueue<>();
+    private BlockingQueue<SteamItem> queue = new LinkedBlockingQueue<>();
 
 
     public boolean isEmpty()
@@ -21,12 +21,12 @@ public class ItemsStorage
         return queue.isEmpty();
     }
 
-    public Item getNext()
+    public SteamItem getNext()
     {
         return queue.poll();
     }
 
-    public void addToQueue(Item item)
+    public void addToQueue(SteamItem item)
     {
         queue.offer(item);
     }

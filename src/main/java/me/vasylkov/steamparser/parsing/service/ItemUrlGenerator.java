@@ -12,7 +12,7 @@ public class ItemUrlGenerator
 {
     public String generateListingsUrl(String itemName)
     {
-        return "https://steamcommunity.com/market/listings/730/" + encodeItem(itemName);
+        return "https://steamcommunity.com/market/listings/730/" + encodeItem(itemName) + "?l=english";
     }
 
     public String generatePriceLink(String itemName)
