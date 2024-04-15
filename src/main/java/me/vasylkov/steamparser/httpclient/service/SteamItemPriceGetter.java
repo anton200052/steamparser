@@ -3,7 +3,7 @@ package me.vasylkov.steamparser.httpclient.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.httpclient.entity.SteamItem;
+import me.vasylkov.steamparser.httpclient.entity.ItemToParseData;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -24,10 +24,10 @@ public class ItemFetcher
     private final Logger logger;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public SteamItem fetchItem(String apiUrl, String listingUrl, String name) //костыль
+    public ItemToParseData fetchItem(String apiUrl, String listingUrl, String name) //костыль
     {
         HttpGet httpGet = new HttpGet(apiUrl);
-        SteamItem item = null;
+        ItemToParseData item = null;
 
         try (CloseableHttpResponse response = httpClient.execute(httpGet))
         {
@@ -37,7 +37,7 @@ public class ItemFetcher
             if (statusCode == HttpStatus.SC_OK && entity != null)
             {
                 String responseContent = EntityUtils.toString(entity);
-                item = objectMapper.readValue(responseContent, SteamItem.class);
+                item = objectMapper.readValue(responseContent, ItemToParseData.class);
             }
             else
             {

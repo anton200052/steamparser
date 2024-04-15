@@ -1,6 +1,7 @@
 package me.vasylkov.steamparser.parsing.service;
 
 import lombok.RequiredArgsConstructor;
+import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
 import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
@@ -10,6 +11,8 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class ItemUrlGenerator
 {
+    private final ParsingProperties parsingProperties;
+
     public String generateListingsUrl(String itemName)
     {
         return "https://steamcommunity.com/market/listings/730/" + encodeItem(itemName) + "?l=english";
@@ -17,7 +20,7 @@ public class ItemUrlGenerator
 
     public String generatePriceLink(String itemName)
     {
-        return "https://steamcommunity.com/market/priceoverview/?market_hash_name=" + encodeItem(itemName) + "&appid=730&currency=18";
+        return "https://steamcommunity.com/market/priceoverview/?market_hash_name=" + encodeItem(itemName) + "&appid=730&currency=" + parsingProperties.getCurrencyTypeNum();
     }
 
     private String encodeItem(String itemName)

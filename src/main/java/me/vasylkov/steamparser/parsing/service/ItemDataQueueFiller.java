@@ -1,7 +1,7 @@
 package me.vasylkov.steamparser.parsing.service;
 
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.httpclient.entity.SteamItem;
+import me.vasylkov.steamparser.httpclient.entity.ItemToParseData;
 import me.vasylkov.steamparser.httpclient.service.ItemFetcher;
 import me.vasylkov.steamparser.parsing.component.ItemsStorage;
 import org.slf4j.Logger;
@@ -30,7 +30,7 @@ public class ItemQueueFiller
             {
                 String marketUrl = itemUrlGenerator.generateListingsUrl(name);
                 String apiUrl = itemUrlGenerator.generatePriceLink(name);
-                SteamItem item = itemFetcher.fetchItem(apiUrl, marketUrl, name);
+                ItemToParseData item = itemFetcher.fetchItem(apiUrl, marketUrl, name);
                 if (item != null)
                 {
                     itemsStorage.addToQueue(item);

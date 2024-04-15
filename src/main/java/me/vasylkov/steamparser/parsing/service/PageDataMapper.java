@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PageCreator
+public class PageToObjectMapper
 {
     private final Logger logger;
     private final ItemUrlGenerator itemUrlGenerator;
@@ -27,7 +27,6 @@ public class PageCreator
     {
         return new Page(parsePageNumber(webDriver, PageNumType.CURRENT), parsePageNumber(webDriver, PageNumType.MAX), parseListings(webDriver));
     }
-
 
     private int parsePageNumber(WebDriver webDriver, PageNumType pageNumType)
     {
