@@ -1,7 +1,7 @@
 package me.vasylkov.steamparser.parsing.service;
 
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.httpclient.service.ItemFetcher;
+import me.vasylkov.steamparser.httpclient.service.SteamItemPriceGetter;
 import me.vasylkov.steamparser.parsing.entity.Listing;
 import me.vasylkov.steamparser.parsing.entity.Page;
 import me.vasylkov.steamparser.parsing.entity.Sticker;
@@ -17,13 +17,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PageToObjectMapper
+public class PageDataMapper
 {
     private final Logger logger;
-    private final ItemUrlGenerator itemUrlGenerator;
-    private final ItemFetcher itemFetcher;
+    private final ItemDataUrlGenerator itemDataUrlGenerator;
+    private final SteamItemPriceGetter steamItemPriceGetter;
 
-    public Page createPage(WebDriver webDriver)
+    public Page mapPageDataToObject(WebDriver webDriver)
     {
         return new Page(parsePageNumber(webDriver, PageNumType.CURRENT), parsePageNumber(webDriver, PageNumType.MAX), parseListings(webDriver));
     }
@@ -63,8 +63,8 @@ public class PageToObjectMapper
 
             for (WebElement stickerElement : stickersElements)
             {
-                String stickerHashName = stickerElement.findElement(By.cssSelector(".sih-image")).getAttribute("title");
-                Double stickerPrice = itemFetcher.fetchItem(itemUrlGenerator.generatePriceLink(stickerHashName), itemUrlGenerator.generateListingsUrl(stickerHashName), stickerHashName).getMedianPrice();
+                String stickerHashName = stickerElement.findElement(By.cssSelector(".sticker-image > img")).getAttribute("title");
+                double stickerPrice = steamItemPriceGetter.getItemMedianPrice(itemDataUrlGenerator.generatePriceOverviewApiUrl(stickerHashName));
                 listingStickers.add(new Sticker(stickerHashName, stickerPrice));
             }
 

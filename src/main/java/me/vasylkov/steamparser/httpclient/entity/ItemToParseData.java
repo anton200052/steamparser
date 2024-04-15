@@ -3,18 +3,15 @@ package me.vasylkov.steamparser.httpclient.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.jackson.PriceDeserializer;
 
-@RequiredArgsConstructor
 @Data
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class SteamItem
+@AllArgsConstructor
+public class ItemToParseData
 {
-    @JsonProperty("median_price")
-    @JsonDeserialize(using = PriceDeserializer.class)
-    private Double medianPrice;
+    private double medianPrice;
     private String hashName;
-    private String url;
+    private String listingsUrl;
 }

@@ -11,6 +11,6 @@ public class LoggerConfiguration
     @Bean
     public Logger logger()
     {
-        return LoggerFactory.getLogger("Steamparser");
+        return LoggerFactory.getLogger("SteamParser");
     }
 }

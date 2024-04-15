@@ -10,4 +10,6 @@ import org.springframework.context.annotation.Configuration;
 public class ParsingProperties
 {
     private String itemsFilePath;
+    private int currencyTypeNum;
+    private int waitingDuration;
 }

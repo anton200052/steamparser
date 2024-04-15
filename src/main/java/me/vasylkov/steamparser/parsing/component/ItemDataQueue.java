@@ -11,7 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Component
 @RequiredArgsConstructor
 @Data
-public class ItemsStorage
+public class ItemDataQueue
 {
     private BlockingQueue<ItemToParseData> queue = new LinkedBlockingQueue<>();
 

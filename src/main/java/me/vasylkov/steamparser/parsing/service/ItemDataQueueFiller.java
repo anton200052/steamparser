@@ -2,8 +2,8 @@ package me.vasylkov.steamparser.parsing.service;
 
 import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.httpclient.entity.ItemToParseData;
-import me.vasylkov.steamparser.httpclient.service.ItemFetcher;
-import me.vasylkov.steamparser.parsing.component.ItemsStorage;
+import me.vasylkov.steamparser.httpclient.service.SteamItemPriceGetter;
+import me.vasylkov.steamparser.parsing.component.ItemDataQueue;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -14,26 +14,28 @@ import java.nio.file.Path;
 
 @Service
 @RequiredArgsConstructor
-public class ItemQueueFiller
+public class ItemDataQueueFiller
 {
 
     private final Logger logger;
-    private final ItemUrlGenerator itemUrlGenerator;
-    private final ItemsStorage itemsStorage;
-    private final ItemFetcher itemFetcher;
+    private final ItemDataUrlGenerator itemDataUrlGenerator;
+    private final ItemDataQueue itemDataQueue;
+    private final SteamItemPriceGetter steamItemPriceGetter;
 
     public void fillQueueFromFile(String filePath)
     {
         try
         {
-            Files.lines(Path.of(filePath), StandardCharsets.UTF_8).forEach(name ->
+            Files.lines(Path.of(filePath), StandardCharsets.UTF_8).forEach(hashName ->
             {
-                String marketUrl = itemUrlGenerator.generateListingsUrl(name);
-                String apiUrl = itemUrlGenerator.generatePriceLink(name);
-                ItemToParseData item = itemFetcher.fetchItem(apiUrl, marketUrl, name);
-                if (item != null)
+                String listingsUrl = itemDataUrlGenerator.generateListingsUrl(hashName);
+                String apiUrl = itemDataUrlGenerator.generatePriceOverviewApiUrl(hashName);
+                double medianPrice = steamItemPriceGetter.getItemMedianPrice(apiUrl);
+
+                if (medianPrice > 0.0)
                 {
-                    itemsStorage.addToQueue(item);
+                    ItemToParseData itemToParseData = new ItemToParseData(medianPrice, hashName, listingsUrl);
+                    itemDataQueue.addToQueue(itemToParseData);
                 }
             });
         }

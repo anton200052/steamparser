@@ -2,8 +2,7 @@ package me.vasylkov.steamparser.spring.component;
 
 import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
-import me.vasylkov.steamparser.selenium.configuration.SeleniumProperties;
-import me.vasylkov.steamparser.parsing.service.ItemQueueFiller;
+import me.vasylkov.steamparser.parsing.service.ItemDataQueueFiller;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +10,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DataInitializer
 {
-    private final ItemQueueFiller itemQueueFiller;
+    private final ItemDataQueueFiller itemDataQueueFiller;
     private final ParsingProperties parsingProperties;
     private final Logger logger;
 
@@ -19,6 +18,6 @@ public class DataInitializer
     {
         logger.info("Загружаем данные в программу");
         String filePath = parsingProperties.getItemsFilePath();
-        itemQueueFiller.fillQueueFromFile(filePath);
+        itemDataQueueFiller.fillQueueFromFile(filePath);
     }
 }

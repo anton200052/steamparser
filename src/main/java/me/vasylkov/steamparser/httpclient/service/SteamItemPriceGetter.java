@@ -1,9 +1,9 @@
 package me.vasylkov.steamparser.httpclient.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.httpclient.entity.ItemToParseData;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -18,16 +18,16 @@ import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
-public class ItemFetcher
+public class SteamItemPriceGetter
 {
     private final CloseableHttpClient httpClient;
     private final Logger logger;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public ItemToParseData fetchItem(String apiUrl, String listingUrl, String name) //костыль
+    public double getItemMedianPrice(String priceOverviewApiUrl)
     {
-        HttpGet httpGet = new HttpGet(apiUrl);
-        ItemToParseData item = null;
+        HttpGet httpGet = new HttpGet(priceOverviewApiUrl);
+        double medianPrice = 0.0;
 
         try (CloseableHttpResponse response = httpClient.execute(httpGet))
         {
@@ -37,27 +37,27 @@ public class ItemFetcher
             if (statusCode == HttpStatus.SC_OK && entity != null)
             {
                 String responseContent = EntityUtils.toString(entity);
-                item = objectMapper.readValue(responseContent, ItemToParseData.class);
+                JsonNode jsonNode = objectMapper.readTree(responseContent);
+                String medianPriceStr = jsonNode.get("median_price").asText();
+
+                // Remove currency symbols and replace comma with a period
+                medianPriceStr = medianPriceStr.replaceAll("[^\\d,\\.]", "").replace(',', '.');
+                medianPrice = Double.parseDouble(medianPriceStr);
             }
             else
             {
-                logger.error("Не удалось обновить данные: {}", name);
+                logger.error("Failed to fetch data: {}", priceOverviewApiUrl);
             }
         }
         catch (IOException | ParseException e)
         {
-            logger.error("Не удалось обновить данные: {}", name, e);
+            logger.error("Failed to fetch data: {}", priceOverviewApiUrl, e);
         }
 
-        if (item != null)
-        {
-            item.setHashName(name);
-            item.setUrl(listingUrl);
-        }
-
-        System.out.println(item);
-        return item;
+        System.out.println("Median Price: " + medianPrice);
+        return medianPrice;
     }
+
 
     @PreDestroy
     public void destroy()

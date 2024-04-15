@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 
 @Service
 @RequiredArgsConstructor
-public class ItemUrlGenerator
+public class ItemDataUrlGenerator
 {
     private final ParsingProperties parsingProperties;
 
@@ -18,7 +18,7 @@ public class ItemUrlGenerator
         return "https://steamcommunity.com/market/listings/730/" + encodeItem(itemName) + "?l=english";
     }
 
-    public String generatePriceLink(String itemName)
+    public String generatePriceOverviewApiUrl(String itemName)
     {
         return "https://steamcommunity.com/market/priceoverview/?market_hash_name=" + encodeItem(itemName) + "&appid=730&currency=" + parsingProperties.getCurrencyTypeNum();
     }
