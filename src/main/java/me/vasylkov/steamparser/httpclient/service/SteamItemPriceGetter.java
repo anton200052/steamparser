@@ -40,7 +40,7 @@ public class SteamItemPriceGetter
                 JsonNode jsonNode = objectMapper.readTree(responseContent);
                 String medianPriceStr = jsonNode.get("median_price").asText();
 
-                // Remove currency symbols and replace comma with a period
+
                 medianPriceStr = medianPriceStr.replaceAll("[^\\d,\\.]", "").replace(',', '.');
                 medianPrice = Double.parseDouble(medianPriceStr);
             }

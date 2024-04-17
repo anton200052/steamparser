@@ -1,7 +1,7 @@
 package me.vasylkov.steamparser.selenium.configuration;
 
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.spring.service.ApplicationShutdownService;
+import me.vasylkov.steamparser.general.service.ApplicationShutdownService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;

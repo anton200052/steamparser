@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.parsing.service;
+package me.vasylkov.steamparser.data.service;
 
 import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;

@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.spring.configuration;
+package me.vasylkov.steamparser.general.configuration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

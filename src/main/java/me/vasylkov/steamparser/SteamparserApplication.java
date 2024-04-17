@@ -8,10 +8,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @EnableConfigurationProperties
 public class SteamparserApplication
 {
-
     public static void main(String[] args)
     {
         SpringApplication.run(SteamparserApplication.class, args);
     }
-
 }

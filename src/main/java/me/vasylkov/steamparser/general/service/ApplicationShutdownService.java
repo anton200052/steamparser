@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.spring.service;
+package me.vasylkov.steamparser.general.service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;

@@ -1,9 +1,9 @@
 package me.vasylkov.steamparser.parsing.service;
 
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.parsing.component.ItemDataQueue;
+import me.vasylkov.steamparser.data.component.ItemDataQueue;
 import me.vasylkov.steamparser.parsing.component.ParsingStatus;
-import me.vasylkov.steamparser.spring.component.DataInitializer;
+import me.vasylkov.steamparser.data.component.DataInitializer;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -21,7 +21,7 @@ public class ParsingTaskManager
     private final ChromeOptions chromeOptions;
     private final Logger logger;
 
-    public void starParsingProcess()
+    public void startParsingProcess()
     {
         if (statusManager.isParsingStarted())
         {

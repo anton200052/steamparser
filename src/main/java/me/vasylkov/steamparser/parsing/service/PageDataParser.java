@@ -1,11 +1,12 @@
 package me.vasylkov.steamparser.parsing.service;
 
 import lombok.RequiredArgsConstructor;
+import me.vasylkov.steamparser.data.service.ItemDataUrlGenerator;
 import me.vasylkov.steamparser.httpclient.service.SteamItemPriceGetter;
 import me.vasylkov.steamparser.parsing.entity.Listing;
 import me.vasylkov.steamparser.parsing.entity.Page;
 import me.vasylkov.steamparser.parsing.entity.Sticker;
-import me.vasylkov.steamparser.parsing.PageNumType;
+import me.vasylkov.steamparser.parsing.entity.PageNumType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -17,13 +18,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PageDataMapper
+public class PageDataParser
 {
     private final Logger logger;
     private final ItemDataUrlGenerator itemDataUrlGenerator;
     private final SteamItemPriceGetter steamItemPriceGetter;
 
-    public Page mapPageDataToObject(WebDriver webDriver)
+    public Page parsePageDataToObject(WebDriver webDriver)
     {
         return new Page(parsePageNumber(webDriver, PageNumType.CURRENT), parsePageNumber(webDriver, PageNumType.MAX), parseListings(webDriver));
     }
@@ -56,6 +57,11 @@ public class PageDataMapper
         List<WebElement> listingsElements = webDriver.findElements(By.className("market_recent_listing_row"));
         for (WebElement listingElement : listingsElements)
         {
+            if (!listingElement.findElements(By.cssSelector(".market_listing_price_without_fee")).isEmpty())
+            {
+                continue;
+            }
+
             String listingHashName = listingElement.findElement(By.cssSelector(".market_listing_item_name")).getText();
             double listingPrice = Double.parseDouble(listingElement.findElement(By.cssSelector(".price_with")).getText().replaceAll("[^\\d,\\.]", "").replaceAll(",", "."));
             List<Sticker> listingStickers = new ArrayList<>();
@@ -68,7 +74,7 @@ public class PageDataMapper
                 listingStickers.add(new Sticker(stickerHashName, stickerPrice));
             }
 
-            listings.add(new Listing(listingHashName, listingPrice, listingStickers));
+            listings.add(new Listing(listingHashName, listingPrice, listingStickers, null, null));
         }
 
         return listings;

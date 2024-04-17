@@ -1,0 +1,22 @@
+data:
+  items:
+    - hashName: "AK-47 | Slate (Field-Tested)"
+      maximumItemMarkup: 20.0
+      stickersModule:
+        enabled: true
+        minimalMarkup: 1.0
+        minimalStickerPrice: 10.0
+    - hashName: "AK-47 | Ice Coaled (Field-Tested)"
+      maximumItemMarkup: 10.0
+      stickersModule:
+        enabled: true
+        minimalMarkup: 20.0
+        minimalStickerPrice: 50.0
+    - hashName: "AK-47 | Slate (Field-Tested)"
+      maximumItemMarkup: 10.0
+      stickersModule:
+        enabled: true
+        minimalMarkup: 20.0
+        minimalStickerPrice: 50.0
+
+#refactor names

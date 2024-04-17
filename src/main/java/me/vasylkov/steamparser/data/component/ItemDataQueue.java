@@ -1,8 +1,8 @@
-package me.vasylkov.steamparser.parsing.component;
+package me.vasylkov.steamparser.data.component;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.httpclient.entity.ItemToParseData;
+import me.vasylkov.steamparser.data.entity.ItemData;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.BlockingQueue;
@@ -13,7 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Data
 public class ItemDataQueue
 {
-    private BlockingQueue<ItemToParseData> queue = new LinkedBlockingQueue<>();
+    private BlockingQueue<ItemData> queue = new LinkedBlockingQueue<>();
 
 
     public boolean isEmpty()
@@ -21,12 +21,12 @@ public class ItemDataQueue
         return queue.isEmpty();
     }
 
-    public ItemToParseData getNext()
+    public ItemData getNext()
     {
         return queue.poll();
     }
 
-    public void addToQueue(ItemToParseData item)
+    public void addToQueue(ItemData item)
     {
         queue.offer(item);
     }
