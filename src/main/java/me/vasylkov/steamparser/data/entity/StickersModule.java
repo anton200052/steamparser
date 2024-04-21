@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class StickersModule
 {
     private Boolean enabled;
-    private Double minimalMarkup;
+    private Double minimalMarkupPercentage;
     private Double minimalStickerPrice;
 
     public boolean isValid()
@@ -22,6 +22,6 @@ public class StickersModule
 
     private boolean hasAnyFieldNull()
     {
-        return minimalMarkup == null || minimalStickerPrice == null;
+        return minimalMarkupPercentage == null || minimalStickerPrice == null;
     }
 }

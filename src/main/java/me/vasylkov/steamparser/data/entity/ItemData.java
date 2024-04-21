@@ -13,7 +13,7 @@ public class ItemData
     private Double medianPrice;
     private String listingsUrl;
     private String apiUrl;
-    private Double maximumItemMarkup;
+    private Double maximalItemMarkupPercentage;
     private StickersModule stickersModule;
 
 
@@ -24,6 +24,6 @@ public class ItemData
 
     private boolean hasAnyFieldNull()
     {
-        return hashName == null || medianPrice == null || listingsUrl == null || apiUrl == null || maximumItemMarkup == null;
+        return hashName == null || medianPrice == null || listingsUrl == null || apiUrl == null || maximalItemMarkupPercentage == null;
     }
 }

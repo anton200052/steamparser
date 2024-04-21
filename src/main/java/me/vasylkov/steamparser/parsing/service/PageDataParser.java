@@ -63,18 +63,21 @@ public class PageDataParser
             }
 
             String listingHashName = listingElement.findElement(By.cssSelector(".market_listing_item_name")).getText();
+            String imgUrl = listingElement.findElement(By.cssSelector(".market_listing_item_img_container > img")).getAttribute("src");
             double listingPrice = Double.parseDouble(listingElement.findElement(By.cssSelector(".price_with")).getText().replaceAll("[^\\d,\\.]", "").replaceAll(",", "."));
             List<Sticker> listingStickers = new ArrayList<>();
             List<WebElement> stickersElements = listingElement.findElement(By.cssSelector("ul")).findElements(By.cssSelector("li"));
+            double totalStickerPrice = 0.0;
 
             for (WebElement stickerElement : stickersElements)
             {
                 String stickerHashName = stickerElement.findElement(By.cssSelector(".sticker-image > img")).getAttribute("title");
                 double stickerPrice = steamItemPriceGetter.getItemMedianPrice(itemDataUrlGenerator.generatePriceOverviewApiUrl(stickerHashName));
+                totalStickerPrice += stickerPrice;
                 listingStickers.add(new Sticker(stickerHashName, stickerPrice));
             }
 
-            listings.add(new Listing(listingHashName, listingPrice, listingStickers, null, null));
+            listings.add(new Listing(listingHashName, listingPrice, listingStickers, imgUrl, totalStickerPrice, null, null));
         }
 
         return listings;

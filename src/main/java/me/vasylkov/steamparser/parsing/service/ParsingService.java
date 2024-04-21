@@ -23,7 +23,6 @@ public class ParsingService
     public void parseItemPage(WebDriver webDriver, ItemData itemData)
     {
         logger.info("Начинаем парсинг предмета {}", itemData.getHashName());
-        messagesSender.sendMessage("1");
         try
         {
             boolean priceExceedsMarkup = false;
@@ -37,11 +36,11 @@ public class ParsingService
 
                 for (Listing listing : analysingResult.getProfitableListings())
                 {
-                    messagesSender.sendMessage(listing.toString());
+                    messagesSender.sendProfitableItemData(listing.getImgUrl(), listing.getHashName(), currentPageNum, listing.getStickers(), listing.getTotalStickersPrice(), listing.getPriceWithStickersMarkup(), listing.getStickersMarkupPercentage());
                 }
 
                 priceExceedsMarkup = analysingResult.isPriceExceedsMaxItemMarkup();
-                currentPageNum = page.getCurrentPage() + 1;
+                currentPageNum = currentPageNum + 1;
             }
         }
         catch (WebDriverException e)

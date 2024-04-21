@@ -2,10 +2,7 @@ package me.vasylkov.steamparser.parsing.service;
 
 import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -22,55 +19,82 @@ public class PageLoader
 
     public void loadPageByPageNum(WebDriver webDriver, String pageUrl, int pageNum)
     {
-        WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(properties.getWaitingDuration()));
-        boolean conditionMet = false;
-        boolean isFirstAttempt = true;
+        WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(properties.getElementsWaitingDuration()));
+        boolean withoutErrors = false;
 
-        while (!conditionMet)
+        while (!withoutErrors)
         {
-            if (!isFirstAttempt || !webDriver.getCurrentUrl().equals(pageUrl))
+            if (!webDriver.getCurrentUrl().equals(pageUrl))
             {
                 webDriver.get(pageUrl);
             }
 
-            isFirstAttempt = false;
-
-            try
+            if (hasTableMessageError(wait))
             {
-                // Проверяем наличие ошибки загрузки страницы до того, как пытаемся перейти на следующую страницу
-                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".market_listing_table_message")));
+                webDriver.get(pageUrl);
                 continue;
             }
-            catch (TimeoutException ignore)
+
+            boolean pageChanged = false;
+            while (!pageChanged)
             {
-                // Если ошибка загрузки листинга не обнаружена, продолжаем
+                executePageChangerScript(webDriver, pageNum);
+                pageChanged = hasPageChangingError(wait, pageNum);
             }
 
-            if (pageNum > 1)
-            {
-                {
-                    JavascriptExecutor javascriptExecutor = (JavascriptExecutor) webDriver;
-                    javascriptExecutor.executeScript("g_oSearchResults.GoToPage(" + (pageNum - 1) + ")");
-                }
-            }
+            withoutErrors = true;
+        }
+    }
 
-            // Проверяем наличие ошибок после перехода на страницу
+    private boolean hasTableMessageError(WebDriverWait webDriverWait)
+    {
+        try
+        {
+            webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".market_listing_table_message")));
+            return true;
+        }
+        catch (TimeoutException ignore)
+        {
+            return false;
+        }
+    }
+
+    private void executePageChangerScript(WebDriver webDriver, int pageNum)
+    {
+        if (pageNum > 1)
+        {
             try
             {
-                wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".sih_label.sih_label_warning")));
+                Thread.sleep(properties.getPageChangingDuration() * 1000L);
             }
-            catch (TimeoutException e)
+            catch (InterruptedException e)
             {
-                try
-                {
-                    System.out.println(pageNum + " from");
-                    wait.until(driver -> driver.findElement(By.className("info")).getText().startsWith(pageNum + " from"));
-                    conditionMet = true;
-                }
-                catch (TimeoutException empty)
-                {
-                }
-                logger.info("Condition met: " + conditionMet);
+                logger.warn("Ошибка при ожидании перед сменой страницы", e);
+            }
+
+            JavascriptExecutor javascriptExecutor = (JavascriptExecutor) webDriver;
+            javascriptExecutor.executeScript("g_oSearchResults.GoToPage(" + (pageNum - 1) + ")");
+        }
+    }
+
+    private boolean hasPageChangingError(WebDriverWait webDriverWait, int pageNum)
+    {
+        try
+        {
+            webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".sih_label.sih_label_warning")));
+            return false;
+        }
+        catch (TimeoutException e)
+        {
+            try
+            {
+                System.out.println(pageNum + " from");
+                webDriverWait.until(driver -> driver.findElement(By.className("info")).getText().startsWith(pageNum + " from"));
+                return true;
+            }
+            catch (TimeoutException | StaleElementReferenceException empty)
+            {
+                return false;
             }
         }
     }

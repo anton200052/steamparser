@@ -11,5 +11,6 @@ public class ParsingProperties
 {
     private String itemsFilePath;
     private int currencyTypeNum;
-    private int waitingDuration;
+    private int elementsWaitingDuration;
+    private int pageChangingDuration;
 }

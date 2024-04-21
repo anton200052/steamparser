@@ -15,6 +15,8 @@ public class Listing
     private String hashName;
     private double price;
     private List<Sticker> stickers;
+    private String imgUrl;
+    private double totalStickersPrice;
     private Double priceWithStickersMarkup;
     private Double stickersMarkupPercentage;
 }

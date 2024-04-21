@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
+import me.vasylkov.steamparser.httpclient.configuration.HttpRequestProperties;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -23,9 +24,19 @@ public class SteamItemPriceGetter
     private final CloseableHttpClient httpClient;
     private final Logger logger;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final HttpRequestProperties properties;
 
     public double getItemMedianPrice(String priceOverviewApiUrl)
     {
+        try
+        {
+            Thread.sleep(properties.getItemPriceGetterDuration() * 1000L);
+        }
+        catch (InterruptedException e)
+        {
+            logger.warn("Ошибка при ожидании перед получением цены предмета", e);
+        }
+
         HttpGet httpGet = new HttpGet(priceOverviewApiUrl);
         double medianPrice = 0.0;
 
@@ -34,12 +45,12 @@ public class SteamItemPriceGetter
             int statusCode = response.getCode();
             HttpEntity entity = response.getEntity();
 
+            System.out.println(statusCode);
             if (statusCode == HttpStatus.SC_OK && entity != null)
             {
                 String responseContent = EntityUtils.toString(entity);
                 JsonNode jsonNode = objectMapper.readTree(responseContent);
                 String medianPriceStr = jsonNode.get("median_price").asText();
-
 
                 medianPriceStr = medianPriceStr.replaceAll("[^\\d,\\.]", "").replace(',', '.');
                 medianPrice = Double.parseDouble(medianPriceStr);

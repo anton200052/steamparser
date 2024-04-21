@@ -56,7 +56,7 @@ public class PageAnalyser
             percentageMarkup = ((priceWithMarkup - itemData.getMedianPrice()) / itemData.getMedianPrice()) * 100;
         }
 
-        if (percentageMarkup >= stickersModule.getMinimalMarkup())
+        if (percentageMarkup >= stickersModule.getMinimalMarkupPercentage())
         {
             listing.setPriceWithStickersMarkup(priceWithMarkup);
             listing.setStickersMarkupPercentage(percentageMarkup);
@@ -81,7 +81,7 @@ public class PageAnalyser
     private double calculatePriceThreshold(ItemData itemData)
     {
         double medianPrice = itemData.getMedianPrice();
-        double maximumItemMarkup = itemData.getMaximumItemMarkup();
+        double maximumItemMarkup = itemData.getMaximalItemMarkupPercentage();
         return medianPrice * (1 + maximumItemMarkup / 100.0);
     }
 }
