@@ -1,16 +1,15 @@
-package me.vasylkov.steamparser.general.service;
+package me.vasylkov.steamparser.general.component;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ApplicationShutdownService
+public class ApplicationShutdownManager
 {
-
     private final ApplicationContext appContext;
 
-    public ApplicationShutdownService(ApplicationContext appContext)
+    public ApplicationShutdownManager(ApplicationContext appContext)
     {
         this.appContext = appContext;
     }

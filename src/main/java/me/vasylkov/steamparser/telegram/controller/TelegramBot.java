@@ -2,8 +2,8 @@ package me.vasylkov.steamparser.telegram.controller;
 
 import lombok.RequiredArgsConstructor;
 
-import me.vasylkov.steamparser.data.component.ItemDataQueue;
-import me.vasylkov.steamparser.parsing.service.ParsingTaskManager;
+import me.vasylkov.steamparser.data.component.SteamItemsQueue;
+import me.vasylkov.steamparser.parsing.service.SteamParsingTaskManager;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -12,8 +12,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 @RequiredArgsConstructor
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer
 {
-    private final ParsingTaskManager parsingTaskManager;
-    private final ItemDataQueue itemDataQueue;
+    private final SteamParsingTaskManager steamParsingTaskManager;
+    private final SteamItemsQueue steamItemsQueue;
 
     @Override
     public void consume(Update update)
@@ -23,11 +23,11 @@ public class TelegramBot implements LongPollingSingleThreadUpdateConsumer
             String text = update.getMessage().getText();
             if (text.equals("/startparsing"))
             {
-                parsingTaskManager.startParsingProcess();
+                steamParsingTaskManager.startParsingProcess();
             }
             else if (text.equals("/stopparsing"))
             {
-                parsingTaskManager.stopParsingProcess();
+                steamParsingTaskManager.stopParsingProcess();
             }
         }
     }

@@ -1,7 +1,7 @@
 package me.vasylkov.steamparser.selenium.configuration;
 
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.general.service.ApplicationShutdownService;
+import me.vasylkov.steamparser.general.component.ApplicationShutdownManager;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +15,7 @@ public class SeleniumConfiguration
 {
     private final SeleniumProperties properties;
     private final Logger logger;
-    private final ApplicationShutdownService applicationShutdownService;
+    private final ApplicationShutdownManager applicationShutdownManager;
 
     @Bean
     public ChromeOptions chromeOptions()
@@ -30,7 +30,7 @@ public class SeleniumConfiguration
         catch (Exception e)
         {
             logger.error("Ошибка при настройке ChromeOptions: ", e);
-            applicationShutdownService.initiateShutdown(1);
+            applicationShutdownManager.initiateShutdown(1);
             throw e;
         }
     }

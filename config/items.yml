@@ -1,5 +1,5 @@
 data:
-  items:
+  steam_items:
     - hashName: "AK-47 | Slate (Field-Tested)"
       maximalItemMarkupPercentage: 20.0
       stickersModule:

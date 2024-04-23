@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class ParsingProperties
 {
     private String itemsFilePath;
-    private int currencyTypeNum;
+    private String currencyCode;
     private int elementsWaitingDuration;
     private int pageChangingDuration;
 }

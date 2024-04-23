@@ -2,7 +2,7 @@ package me.vasylkov.steamparser.data.component;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.data.entity.ItemData;
+import me.vasylkov.steamparser.data.entity.SteamItem;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.BlockingQueue;
@@ -11,22 +11,25 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Component
 @RequiredArgsConstructor
 @Data
-public class ItemDataQueue
+public class SteamItemsQueue implements ItemQueue<SteamItem>
 {
-    private BlockingQueue<ItemData> queue = new LinkedBlockingQueue<>();
+    private BlockingQueue<SteamItem> queue = new LinkedBlockingQueue<>();
 
 
+    @Override
     public boolean isEmpty()
     {
         return queue.isEmpty();
     }
 
-    public ItemData getNext()
+    @Override
+    public SteamItem getNext()
     {
         return queue.poll();
     }
 
-    public void addToQueue(ItemData item)
+    @Override
+    public void addToQueue(SteamItem item)
     {
         queue.offer(item);
     }

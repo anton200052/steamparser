@@ -12,7 +12,7 @@ import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
-public class PageLoader
+public class SteamPageLoader
 {
     private final Logger logger;
     private final ParsingProperties properties;

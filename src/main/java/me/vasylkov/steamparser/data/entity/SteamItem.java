@@ -4,19 +4,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ItemData
+public class SteamItem implements Item
 {
     private String hashName;
-    private Double medianPrice;
+    private Double averagePrice;
     private String listingsUrl;
-    private String apiUrl;
     private Double maximalItemMarkupPercentage;
     private StickersModule stickersModule;
 
-
+    @Override
     public boolean isValid()
     {
         return !hasAnyFieldNull() && (stickersModule == null || stickersModule.isValid());
@@ -24,6 +25,6 @@ public class ItemData
 
     private boolean hasAnyFieldNull()
     {
-        return hashName == null || medianPrice == null || listingsUrl == null || apiUrl == null || maximalItemMarkupPercentage == null;
+        return hashName == null || averagePrice == null || listingsUrl == null || maximalItemMarkupPercentage == null;
     }
 }

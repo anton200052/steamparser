@@ -8,17 +8,17 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class StickersModule
+public class StickersModule implements Module
 {
     private Boolean enabled;
     private Double minimalMarkupPercentage;
     private Double minimalStickerPrice;
 
+    @Override
     public boolean isValid()
     {
         return (enabled == null || !enabled) || (enabled && !hasAnyFieldNull());
     }
-
 
     private boolean hasAnyFieldNull()
     {
