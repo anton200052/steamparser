@@ -88,7 +88,7 @@ public class SteamPageLoader
         {
             try
             {
-                System.out.println(pageNum + " from");
+                logger.info("Страница: {}", pageNum);
                 webDriverWait.until(driver -> driver.findElement(By.className("info")).getText().startsWith(pageNum + " from"));
                 return true;
             }

@@ -23,6 +23,7 @@ public class SeleniumConfiguration
         try
         {
             ChromeOptions options = new ChromeOptions();
+            System.setProperty("webdriver.chrome.driver", properties.getDriverPath());
             options.addArguments("user-data-dir=" + properties.getProfilePath());
             options.addExtensions(new File(properties.getExtensionPath()));
             return options;

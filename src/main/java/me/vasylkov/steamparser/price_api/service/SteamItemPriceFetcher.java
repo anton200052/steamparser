@@ -6,11 +6,13 @@ import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.data.entity.Item;
 import me.vasylkov.steamparser.price_api.configuration.PriceApiProperties;
 import org.slf4j.Logger;
+import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -29,7 +31,7 @@ public class SteamItemPriceFetcher implements ItemPriceFetcher
     {
         pauseBeforeRequest();
         double price = getAveragePriceFromApi(priceApiUrl);
-        logger.info("Average price is {}", price);
+        logger.info("Цена предмета/стикера {}", price);
         return price;
     }
 
@@ -51,28 +53,29 @@ public class SteamItemPriceFetcher implements ItemPriceFetcher
         try
         {
             ResponseEntity<String> response = restTemplate.getForEntity(priceApiUrl, String.class);
-            return parseResponse(response);
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null)
+            {
+                return parseResponse(response);
+            }
         }
-        catch (Exception e)
+        catch (HttpClientErrorException e)
         {
-            logger.error("Не удалось получить данные по URL: {}", priceApiUrl, e);
-            return 0.0;
+            logger.error("Не удалось получить данные по URL: {}. С причиной {}", priceApiUrl, e.getMessage());
         }
+
+        return 0.0;
     }
 
-    private double parseResponse(ResponseEntity<String> response) throws IOException
+    private double parseResponse(ResponseEntity<String> response)
     {
-        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null)
+        try
         {
             JsonNode jsonNode = objectMapper.readTree(response.getBody());
-            if (jsonNode.get("success").asBoolean())
-            {
-                return jsonNode.get("price").get("average").asDouble();
-            }
-            else
-            {
-                logger.error("Апи отдал ответ success = false");
-            }
+            return jsonNode.get("price").get("average").asDouble();
+        }
+        catch (IOException e)
+        {
+            logger.error("Ошибка при парсинге ответа от API!");
         }
         return 0.0;
     }

@@ -13,6 +13,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>steamparser</name>
 	<description>steamparser</description>
+
 	<properties>
 		<java.version>17</java.version>
 	</properties>
@@ -39,11 +40,6 @@
 		<dependency>
 			<groupId>org.telegram</groupId>
 			<artifactId>telegrambots-client</artifactId>
-			<version>7.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.telegram</groupId>
-			<artifactId>telegrambots-extensions</artifactId>
 			<version>7.2.0</version>
 		</dependency>
 		<dependency>

@@ -58,11 +58,13 @@ public class TelegramMessagesSender implements MessagesSender
     }
 
     @Override
-    public void sendProfitableItemData(String imgUrl, String hashName, int position, List<Sticker> stickers, double totalStickersPrice, Double priceWithStickersMarkup, Double stickersMarkupPercentage)
+    public void sendProfitableItemData(String imgUrl, String hashName, double averageItemPrice, double currentPrice, int position, List<Sticker> stickers, double totalStickersPrice, double priceWithStickersMarkup, double stickersMarkupPercentage)
     {
         StringBuilder captionBuilder = new StringBuilder();
 
         captionBuilder.append("Название предмета: ").append(hashName).append("\n");
+        captionBuilder.append("Средняя цена предмета: ").append(averageItemPrice).append("\n");
+        captionBuilder.append("Текущая цена: ").append(currentPrice).append("\n");
         captionBuilder.append("Позиция / страница: ").append(position).append("\n");
 
         captionBuilder.append("Стикеры:\n");
@@ -76,8 +78,8 @@ public class TelegramMessagesSender implements MessagesSender
         double roundedMarkupPercentage = Math.round(stickersMarkupPercentage * 10.0) / 10.0;
 
         captionBuilder.append("Общая стоимость стикеров: ").append(roundedTotalStickersPrice).append("\n");
-        captionBuilder.append("Грязный профит: ").append(roundedMarkupPrice).append("\n");
-        captionBuilder.append("Грязный профит (проценты): ").append(roundedMarkupPercentage).append("%\n");
+        captionBuilder.append("\"Можно\" продать за: ").append(roundedMarkupPrice).append("\n");
+        captionBuilder.append("Грязный \"профит\" в процентах: ").append(roundedMarkupPercentage).append("%\n");
 
         String caption = captionBuilder.toString();
         sendPhotoWithCaption(caption, imgUrl);

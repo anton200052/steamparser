@@ -1,6 +1,5 @@
 package me.vasylkov.steamparser.parsing.service;
 
-import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.data.entity.Item;
 import me.vasylkov.steamparser.data.entity.SteamItem;
 import me.vasylkov.steamparser.general.interfaces.MessagesSender;
@@ -20,7 +19,9 @@ public class SteamParsingService implements ParsingService
     @Qualifier("steamPageDataParser")
     private final PageDataParser pageDataParser;
     private final SteamPageLoader steamPageLoader;
+    @Qualifier("steamPageAnalyser")
     private final PageAnalyser pageAnalyser;
+    @Qualifier("telegramMessagesSender")
     private final MessagesSender messagesSender;
 
     public SteamParsingService(Logger logger, PageDataParser pageDataParser, SteamPageLoader steamPageLoader, PageAnalyser pageAnalyser, MessagesSender messagesSender)
@@ -50,7 +51,7 @@ public class SteamParsingService implements ParsingService
 
                 for (Listing listing : analysingResult.getProfitableListings())
                 {
-                    messagesSender.sendProfitableItemData(listing.getImgUrl(), listing.getHashName(), currentPageNum, listing.getStickers(), listing.getTotalStickersPrice(), listing.getPriceWithStickersMarkup(), listing.getStickersMarkupPercentage());
+                    messagesSender.sendProfitableItemData(listing.getImgUrl(), listing.getHashName(), item.getAveragePrice(), listing.getPrice(), currentPageNum, listing.getStickers(), listing.getTotalStickersPrice(), listing.getPriceWithStickersMarkup(), listing.getStickersMarkupPercentage());
                 }
 
                 priceExceedsMarkup = analysingResult.isPriceExceedsMaxItemMarkup();

@@ -21,6 +21,6 @@ public class ItemUrlGenerator
 
     public String generatePriceOverviewApiUrl(String itemName)
     {
-        return "http://localhost:8080/api/items/singleItem" + "?hashName=" + itemName + "&currencyCode=" + parsingProperties.getCurrencyCode();
+        return "http://192.168.0.107:8080/api/items/singleItem" + "?hashName=" + itemName + "&currencyCode=" + parsingProperties.getCurrencyCode();
     }
 }

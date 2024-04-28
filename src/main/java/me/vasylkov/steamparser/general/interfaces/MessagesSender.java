@@ -8,5 +8,5 @@ public interface MessagesSender
 {
     void sendMessage(String message);
     void sendPhotoWithCaption(String caption, String photoUrl);
-    void sendProfitableItemData(String imgUrl, String hashName, int position, List<Sticker> stickers, double totalStickersPrice, Double priceWithStickersMarkup, Double stickersMarkupPercentage);
+    void sendProfitableItemData(String imgUrl, String hashName, double averageItemPrice, double currentPrice, int position, List<Sticker> stickers, double totalStickersPrice, double priceWithStickersMarkup, double stickersMarkupPercentage);
 }
