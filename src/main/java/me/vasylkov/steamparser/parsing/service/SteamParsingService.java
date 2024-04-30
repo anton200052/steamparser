@@ -3,8 +3,9 @@ package me.vasylkov.steamparser.parsing.service;
 import me.vasylkov.steamparser.data.entity.Item;
 import me.vasylkov.steamparser.data.entity.SteamItem;
 import me.vasylkov.steamparser.general.interfaces.MessagesSender;
-import me.vasylkov.steamparser.parsing.entity.AnalysingResult;
 import me.vasylkov.steamparser.parsing.entity.Listing;
+import me.vasylkov.steamparser.parsing.entity.SteamAnalysingResult;
+import me.vasylkov.steamparser.parsing.entity.SteamListing;
 import me.vasylkov.steamparser.parsing.entity.SteamPage;
 import org.openqa.selenium.*;
 import org.slf4j.Logger;
@@ -47,14 +48,14 @@ public class SteamParsingService implements ParsingService
             {
                 steamPageLoader.loadPageByPageNum(webDriver, steamItem.getListingsUrl(), currentPageNum);
                 SteamPage steamPage = (SteamPage) pageDataParser.parsePageDataToObject(webDriver);
-                AnalysingResult analysingResult = pageAnalyser.analysePage(steamPage, steamItem);
+                SteamAnalysingResult steamAnalysingResult = pageAnalyser.analysePage(steamPage, steamItem);
 
-                for (Listing listing : analysingResult.getProfitableListings())
+                for (Listing listing : steamAnalysingResult.getProfitableListings())
                 {
                     messagesSender.sendProfitableItemData(listing.getImgUrl(), listing.getHashName(), item.getAveragePrice(), listing.getPrice(), currentPageNum, listing.getStickers(), listing.getTotalStickersPrice(), listing.getPriceWithStickersMarkup(), listing.getStickersMarkupPercentage());
                 }
 
-                priceExceedsMarkup = analysingResult.isPriceExceedsMaxItemMarkup();
+                priceExceedsMarkup = steamAnalysingResult.isPriceExceedsMaxItemMarkup();
                 currentPageNum = currentPageNum + 1;
             }
         }

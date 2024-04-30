@@ -1,6 +1,8 @@
 package me.vasylkov.steamparser.data.component;
 
-public interface ItemQueue<T>
+import me.vasylkov.steamparser.data.entity.Item;
+
+public interface ItemQueue<T extends Item>
 {
     boolean isEmpty();
 

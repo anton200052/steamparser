@@ -1,7 +1,6 @@
 package me.vasylkov.steamparser.parsing.service;
 
 import me.vasylkov.steamparser.data.entity.Item;
-import me.vasylkov.steamparser.data.entity.SteamItem;
 import me.vasylkov.steamparser.data.entity.StickersModule;
 import me.vasylkov.steamparser.parsing.entity.*;
 import org.springframework.stereotype.Service;
@@ -12,27 +11,27 @@ import java.util.List;
 @Service
 public class SteamPageAnalyser implements PageAnalyser
 {
-    public AnalysingResult analysePage(Page page, Item item)
+    @Override
+    public SteamAnalysingResult analysePage(Page page, Item item)
     {
-        SteamItem steamItem = (SteamItem) item;
-        List<Listing> profitableListings = getProfitableListingsIfPresent(page, steamItem);
-        boolean priceExceedsMaxItemMarkup = hasListingPriceThatExceedsMaxMarkup(page, steamItem);
-        return new AnalysingResult(profitableListings, priceExceedsMaxItemMarkup);
+        List<Listing> profitableSteamListings = getProfitableListingsIfPresent(page, item);
+        boolean priceExceedsMaxItemMarkup = hasListingsPriceThreshold(page, item);
+        return new SteamAnalysingResult(profitableSteamListings, priceExceedsMaxItemMarkup);
     }
 
-    private List<Listing> getProfitableListingsIfPresent(Page page, SteamItem steamItem)
+    private List<Listing> getProfitableListingsIfPresent(Page page, Item item)
     {
         List<Listing> profitableListings = new ArrayList<>();
         for (Listing listing : page.getListings())
         {
-            if (listing.getPrice() > calculatePriceThreshold(steamItem))
+            if (listing.getPrice() > calculatePriceThreshold(item))
             {
                 break;
             }
 
-            if (steamItem.getStickersModule() != null && steamItem.getStickersModule().isValid())
+            if (item.getStickersModule() != null && item.getStickersModule().isValid())
             {
-                analyseStickers(listing, steamItem, profitableListings);
+                analyseStickers(listing, item, profitableListings);
             }
         }
         return profitableListings;
@@ -41,33 +40,53 @@ public class SteamPageAnalyser implements PageAnalyser
     private void analyseStickers(Listing listing, Item item, List<Listing> profitableListings)
     {
         StickersModule stickersModule = item.getStickersModule();
-        double totalStickersPrice = 0.0;
-        double currentPrice = listing.getPrice();
-        for (Sticker sticker : listing.getStickers())
+        double totalStickersPrice = calculateTotalStickersPrice(listing.getStickers(), stickersModule.getMinimalStickerPrice());
+        double currentItemPrice = listing.getPrice();
+        double averageItemPrice = item.getAveragePrice();
+
+        if (isItemPriceNotExceedingAverage(averageItemPrice, currentItemPrice))
         {
-            double price = sticker.getPrice();
-            if (price >= stickersModule.getMinimalStickerPrice())
-            {
-                totalStickersPrice += price;
-            }
-        }
-        double adjustedStickersPrice = totalStickersPrice * 0.05;
-        double priceWithMarkup = adjustedStickersPrice + item.getAveragePrice();
-        double percentageMarkup = 0.0;
-        if (item.getAveragePrice() != 0.0)
-        {
-            percentageMarkup = ((priceWithMarkup - currentPrice) / currentPrice) * 100;
+            averageItemPrice = currentItemPrice;
         }
 
-        if (percentageMarkup >= stickersModule.getMinimalMarkupPercentage())
+        double averageStickersMarkup = calculateAverageStickersMarkup(totalStickersPrice, averageItemPrice);
+        double itemMarkup = calculateItemMarkupByStickers(averageStickersMarkup, currentItemPrice);
+
+        if (itemMarkup >= stickersModule.getMinimalMarkupPercentage())
         {
-            listing.setPriceWithStickersMarkup(priceWithMarkup);
-            listing.setStickersMarkupPercentage(percentageMarkup);
+            listing.setPriceWithStickersMarkup(averageStickersMarkup);
+            listing.setStickersMarkupPercentage(itemMarkup);
             profitableListings.add(listing);
         }
     }
 
-    private boolean hasListingPriceThatExceedsMaxMarkup(Page page, Item item)
+    private double calculateTotalStickersPrice(List<Sticker> stickers, double minimalStickersPrice)
+    {
+        double totalStickersPrice = 0.0;
+        for (Sticker sticker : stickers)
+        {
+            double price = sticker.getPrice();
+            if (price >= minimalStickersPrice)
+            {
+                totalStickersPrice += price;
+            }
+        }
+        return totalStickersPrice;
+    }
+
+    private double calculateItemMarkupByStickers(double averageStickersMarkup, double currentItemPrice)
+    {
+        return ((averageStickersMarkup - currentItemPrice) / currentItemPrice) * 100;
+    }
+
+    private double calculateAverageStickersMarkup(double totalStickersPrice, double averageItemPrice)
+    {
+        double adjustedStickersPrice = totalStickersPrice * 0.05;
+        return adjustedStickersPrice + averageItemPrice;
+    }
+
+
+    private boolean hasListingsPriceThreshold(Page page, Item item)
     {
         double priceThreshold = calculatePriceThreshold(item);
         for (Listing listing : page.getListings())
@@ -86,5 +105,10 @@ public class SteamPageAnalyser implements PageAnalyser
         double medianPrice = item.getAveragePrice();
         double maximumItemMarkup = item.getMaximalItemMarkupPercentage();
         return medianPrice * (1 + maximumItemMarkup / 100.0);
+    }
+
+    private boolean isItemPriceNotExceedingAverage(double averageItemPrice, double currentItemPrice)
+    {
+        return currentItemPrice <= averageItemPrice;
     }
 }

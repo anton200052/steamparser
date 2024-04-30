@@ -13,7 +13,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 public class TelegramBot implements LongPollingSingleThreadUpdateConsumer
 {
     private final SteamParsingTaskManager steamParsingTaskManager;
-    private final SteamItemsQueue steamItemsQueue;
 
     @Override
     public void consume(Update update)

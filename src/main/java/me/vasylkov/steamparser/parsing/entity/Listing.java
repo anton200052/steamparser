@@ -1,21 +1,27 @@
 package me.vasylkov.steamparser.parsing.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class Listing
+public interface Listing
 {
-    private String hashName;
-    private double price;
-    private List<Sticker> stickers;
-    private String imgUrl;
-    private double totalStickersPrice;
-    private Double priceWithStickersMarkup;
-    private Double stickersMarkupPercentage;
+    String getHashName();
+    void setHashName(String hashName);
+
+    double getPrice();
+    void setPrice(double price);
+
+    List<Sticker> getStickers();
+    void setStickers(List<Sticker> stickers);
+
+    String getImgUrl();
+    void setImgUrl(String imgUrl);
+
+    double getTotalStickersPrice();
+    void setTotalStickersPrice(double totalStickersPrice);
+
+    Double getPriceWithStickersMarkup();
+    void setPriceWithStickersMarkup(Double priceWithStickersMarkup);
+
+    Double getStickersMarkupPercentage();
+    void setStickersMarkupPercentage(Double stickersMarkupPercentage);
 }

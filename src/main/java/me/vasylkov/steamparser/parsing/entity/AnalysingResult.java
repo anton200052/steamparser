@@ -1,14 +1,12 @@
 package me.vasylkov.steamparser.parsing.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-public class AnalysingResult
+public interface AnalysingResult
 {
-    private List<Listing> profitableListings;
-    private boolean priceExceedsMaxItemMarkup;
+    List<Listing> getProfitableListings();
+    void setProfitableListings(List<Listing> listings);
+
+    boolean isPriceExceedsMaxItemMarkup();
+    void setPriceExceedsMaxItemMarkup(boolean b);
 }

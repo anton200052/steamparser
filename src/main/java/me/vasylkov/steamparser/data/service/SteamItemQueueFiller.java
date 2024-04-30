@@ -26,9 +26,12 @@ public class SteamItemQueueFiller implements ItemQueueFiller
         {
             String hashName = steamItem.getHashName();
             double averagePrice = steamItemPriceFetcher.fetchItemAveragePrice(itemUrlGenerator.generatePriceOverviewApiUrl(hashName));
-            String listingsUrl = itemUrlGenerator.generateListingsUrl(hashName);
+            String listingsUrl = itemUrlGenerator.generateSteamListingsUrl(hashName);
 
-            steamItem.setAveragePrice(averagePrice);
+            if (averagePrice > 0.0)
+            {
+                steamItem.setAveragePrice(averagePrice);
+            }
             steamItem.setListingsUrl(listingsUrl);
 
             if (steamItem.isValid())
@@ -37,7 +40,7 @@ public class SteamItemQueueFiller implements ItemQueueFiller
             }
             else
             {
-                logger.warn("Ошибка при загрузке предмета {}, проверьте конфигурацию. Парсинг этого предмета НЕ будет запущен", hashName);
+                logger.warn("Ошибка при загрузке предмета {}. Парсинг этого предмета НЕ будет запущен", hashName);
             }
         }
     }

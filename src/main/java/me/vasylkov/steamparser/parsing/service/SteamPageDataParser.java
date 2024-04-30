@@ -83,7 +83,7 @@ public class SteamPageDataParser implements PageDataParser
                 listingStickers.add(new Sticker(stickerHashName, stickerPrice));
             }
 
-            listings.add(new Listing(listingHashName, listingPrice, listingStickers, imgUrl, totalStickerPrice, null, null));
+            listings.add(new SteamListing(listingHashName, listingPrice, listingStickers, imgUrl, totalStickerPrice, null, null));
         }
 
         return listings;
