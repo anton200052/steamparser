@@ -3,19 +3,15 @@ package me.vasylkov.steamparser.price_api.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.data.entity.Item;
 import me.vasylkov.steamparser.price_api.configuration.PriceApiProperties;
 import org.slf4j.Logger;
-import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +28,7 @@ public class SteamItemPriceFetcher implements ItemPriceFetcher
     {
         pauseBeforeRequest();
         double price = getAveragePriceFromApi(priceApiUrl);
-        logger.info("Цена предмета/стикера {}", price);
+        logger.info("Цена предмета: {}", price);
         return price;
     }
 
@@ -72,13 +68,19 @@ public class SteamItemPriceFetcher implements ItemPriceFetcher
         try
         {
             JsonNode jsonNode = objectMapper.readTree(response.getBody());
-            return jsonNode.get("price").get("average").asDouble();
+            if (jsonNode.get("success").asBoolean())
+            {
+                return jsonNode.get("priceAvg").asDouble();
+            }
+            else
+            {
+                logger.error("Ответ от API не успешен!");
+            }
         }
         catch (IOException e)
         {
-            logger.error("Ошибка при парсинге ответа от API!");
+            logger.error("Ошибка при парсинге ответа от API!", e);
         }
         return 0.0;
     }
 }
-

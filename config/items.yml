@@ -6,3 +6,15 @@ data:
         enabled: true
         minimalMarkupPercentage: 0.0001
         minimalStickerPrice: 10.0
+    - hashName: "AK-47 | Slate (Field-Tested)"
+      maximalItemMarkupPercentage: 20.0
+      stickersModule:
+        enabled: true
+        minimalMarkupPercentage: 0.0001
+        minimalStickerPrice: 10.0
+    - hashName: "AK-47 | Slate (Field-Tested)"
+      maximalItemMarkupPercentage: 20.0
+      stickersModule:
+        enabled: true
+        minimalMarkupPercentage: 0.0001
+        minimalStickerPrice: 10.0

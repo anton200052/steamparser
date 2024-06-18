@@ -11,7 +11,7 @@ public interface Listing
     void setPrice(double price);
 
     List<Sticker> getStickers();
-    void setStickers(List<Sticker> stickers);
+    void setStickers(List<Sticker> steamStickers);
 
     String getImgUrl();
     void setImgUrl(String imgUrl);

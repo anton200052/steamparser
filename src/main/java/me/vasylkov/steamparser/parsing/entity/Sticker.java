@@ -1,13 +1,10 @@
 package me.vasylkov.steamparser.parsing.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-
-@Data
-@AllArgsConstructor
-public class Sticker
+public interface Sticker
 {
-    private String hashName;
-    private double price;
+    String getHashName();
+    void setHashName(String hashName);
+
+    double getPrice();
+    void setPrice(double price);
 }

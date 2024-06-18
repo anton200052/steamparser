@@ -9,18 +9,18 @@ import java.nio.charset.StandardCharsets;
 
 @Component
 @RequiredArgsConstructor
-public class ItemUrlGenerator
+public class SteamItemUrlGenerator implements UrlGenerator
 {
     private final ParsingProperties parsingProperties;
 
-    public String generateSteamListingsUrl(String itemName)
+    public String generateListingsUrl(String itemName)
     {
         return "https://steamcommunity.com/market/listings/730/" + encodeItem(itemName) + "?l=english";
     }
 
     public String generatePriceOverviewApiUrl(String itemName)
     {
-        return "http://192.168.0.107:8080/api/items/singleItem" + "?hashName=" + itemName + "&currencyCode=" + parsingProperties.getCurrencyCode();
+        return "http://localhost:8080/api/items/singleItem" + "?hashName=" + itemName + "&currencyCode=" + parsingProperties.getCurrencyCode();
     }
 
     private String encodeItem(String itemName)

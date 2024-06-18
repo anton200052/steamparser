@@ -1,25 +1,39 @@
 package me.vasylkov.steamparser.parsing.service;
 
-import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.data.component.SteamItemsQueue;
+import me.vasylkov.steamparser.data.component.ItemQueueManager;
+import me.vasylkov.steamparser.data.component.SteamItemsQueueManager;
+import me.vasylkov.steamparser.data.entity.SteamItem;
+import me.vasylkov.steamparser.general.interfaces.MessagesSender;
+import me.vasylkov.steamparser.parsing.component.ParsingStatus;
 import me.vasylkov.steamparser.parsing.component.SteamParsingStatus;
-import me.vasylkov.steamparser.data.component.DataInitializer;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
+import me.vasylkov.steamparser.telegram.service.TelegramMessagesSender;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
 public class SteamParsingTaskManager implements ParsingTaskManager
 {
-    private final SteamItemsQueue steamItemsQueue;
-    private final DataInitializer dataInitializer;
-    private final SteamParsingStatus statusManager;
-    private final SteamParsingService steamParsingService;
-    private final ChromeOptions chromeOptions;
+    private final ItemQueueManager<SteamItem> steamItemsQueue;
+    @Qualifier("steamParsingStatus")
+    private final ParsingStatus statusManager;
+    @Qualifier("steamParsingService")
+    private final ParsingService steamParsingService;
+    @Qualifier("telegramMessagesSender")
+    private final MessagesSender messagesSender;
     private final Logger logger;
+    private final ParsingProperties parsingProperties;
+
+    public SteamParsingTaskManager(SteamItemsQueueManager steamItemsQueue, SteamParsingStatus statusManager, SteamParsingService steamParsingService, TelegramMessagesSender messagesSender, Logger logger, ParsingProperties parsingProperties)
+    {
+        this.steamItemsQueue = steamItemsQueue;
+        this.statusManager = statusManager;
+        this.steamParsingService = steamParsingService;
+        this.messagesSender = messagesSender;
+        this.logger = logger;
+        this.parsingProperties = parsingProperties;
+    }
 
     @Override
     public void startParsingProcess()
@@ -30,14 +44,15 @@ public class SteamParsingTaskManager implements ParsingTaskManager
             return;
         }
 
-        dataInitializer.init();
+        statusManager.setParsingStarted(true);
+        messagesSender.sendMessage("Начинаем парсинг. Доп. информация доступна в консоли приложения");
+        int threads = parsingProperties.getThreads();
+        logger.info("Начинаем парсинг на {} потоках", threads);
 
-        WebDriver webDriver = new ChromeDriver(chromeOptions);
-        while (!steamItemsQueue.isEmpty())
+        for (int i = 0; i < threads; i++)
         {
-            steamParsingService.parseItemPage(webDriver, steamItemsQueue.getNext());
+            steamParsingService.executeAsyncParsingTask();
         }
-        webDriver.close();
     }
 
     @Override
@@ -46,6 +61,10 @@ public class SteamParsingTaskManager implements ParsingTaskManager
         if (!statusManager.isParsingStarted())
         {
             logger.error("Невозможно остановить парсинг пока ты его не начал");
+            return;
         }
+
+        statusManager.setParsingStarted(false);
+        messagesSender.sendMessage("Останавливаем парсинг!");
     }
 }

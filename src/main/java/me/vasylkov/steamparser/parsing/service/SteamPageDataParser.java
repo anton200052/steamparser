@@ -1,6 +1,6 @@
 package me.vasylkov.steamparser.parsing.service;
 
-import me.vasylkov.steamparser.data.component.ItemUrlGenerator;
+import me.vasylkov.steamparser.data.component.SteamItemUrlGenerator;
 import me.vasylkov.steamparser.price_api.service.ItemPriceFetcher;
 import me.vasylkov.steamparser.parsing.entity.*;
 import org.openqa.selenium.By;
@@ -17,15 +17,15 @@ import java.util.List;
 public class SteamPageDataParser implements PageDataParser
 {
     private final Logger logger;
-    private final ItemUrlGenerator itemUrlGenerator;
+    private final SteamItemUrlGenerator steamItemUrlGenerator;
 
     @Qualifier("steamItemPriceFetcher")
     private final ItemPriceFetcher itemPriceFetcher;
 
-    public SteamPageDataParser(Logger logger, ItemUrlGenerator itemUrlGenerator, ItemPriceFetcher itemPriceFetcher)
+    public SteamPageDataParser(Logger logger, SteamItemUrlGenerator steamItemUrlGenerator, ItemPriceFetcher itemPriceFetcher)
     {
         this.logger = logger;
-        this.itemUrlGenerator = itemUrlGenerator;
+        this.steamItemUrlGenerator = steamItemUrlGenerator;
         this.itemPriceFetcher = itemPriceFetcher;
     }
 
@@ -71,19 +71,19 @@ public class SteamPageDataParser implements PageDataParser
             String listingHashName = listingElement.findElement(By.cssSelector(".market_listing_item_name")).getText();
             String imgUrl = listingElement.findElement(By.cssSelector(".market_listing_item_img_container > img")).getAttribute("src");
             double listingPrice = Double.parseDouble(listingElement.findElement(By.cssSelector(".price_with")).getText().replaceAll("[^\\d,\\.]", "").replaceAll(",", "."));
-            List<Sticker> listingStickers = new ArrayList<>();
+            List<Sticker> listingSteamStickers = new ArrayList<>();
             List<WebElement> stickersElements = listingElement.findElement(By.cssSelector("ul")).findElements(By.cssSelector("li"));
             double totalStickerPrice = 0.0;
 
             for (WebElement stickerElement : stickersElements)
             {
                 String stickerHashName = stickerElement.findElement(By.cssSelector(".sticker-image > img")).getAttribute("title");
-                double stickerPrice = itemPriceFetcher.fetchItemAveragePrice(itemUrlGenerator.generatePriceOverviewApiUrl(stickerHashName));
+                double stickerPrice = itemPriceFetcher.fetchItemAveragePrice(steamItemUrlGenerator.generatePriceOverviewApiUrl(stickerHashName));
                 totalStickerPrice += stickerPrice;
-                listingStickers.add(new Sticker(stickerHashName, stickerPrice));
+                listingSteamStickers.add(new SteamSticker(stickerHashName, stickerPrice));
             }
 
-            listings.add(new SteamListing(listingHashName, listingPrice, listingStickers, imgUrl, totalStickerPrice, null, null));
+            listings.add(new SteamListing(listingHashName, listingPrice, listingSteamStickers, imgUrl, totalStickerPrice, null, null));
         }
 
         return listings;

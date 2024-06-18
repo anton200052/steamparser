@@ -16,4 +16,7 @@ public interface Item extends Validable
 
     StickersModule getStickersModule();
     void setStickersModule(StickersModule stickersModule);
+
+    boolean isAvailable();
+    void setAvailable(boolean available);
 }

@@ -13,4 +13,6 @@ public class ParsingProperties
     private String currencyCode;
     private int elementsWaitingDuration;
     private int pageChangingDuration;
+    private boolean cycling;
+    private int threads;
 }

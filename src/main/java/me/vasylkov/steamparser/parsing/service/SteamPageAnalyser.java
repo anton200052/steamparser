@@ -12,7 +12,7 @@ import java.util.List;
 public class SteamPageAnalyser implements PageAnalyser
 {
     @Override
-    public SteamAnalysingResult analysePage(Page page, Item item)
+    public AnalysingResult analysePage(Page page, Item item)
     {
         List<Listing> profitableSteamListings = getProfitableListingsIfPresent(page, item);
         boolean priceExceedsMaxItemMarkup = hasListingsPriceThreshold(page, item);
@@ -60,12 +60,12 @@ public class SteamPageAnalyser implements PageAnalyser
         }
     }
 
-    private double calculateTotalStickersPrice(List<Sticker> stickers, double minimalStickersPrice)
+    private double calculateTotalStickersPrice(List<Sticker> steamStickers, double minimalStickersPrice)
     {
         double totalStickersPrice = 0.0;
-        for (Sticker sticker : stickers)
+        for (Sticker steamSticker : steamStickers)
         {
-            double price = sticker.getPrice();
+            double price = steamSticker.getPrice();
             if (price >= minimalStickersPrice)
             {
                 totalStickersPrice += price;

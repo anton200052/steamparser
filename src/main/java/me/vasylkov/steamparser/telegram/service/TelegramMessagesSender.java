@@ -2,6 +2,7 @@ package me.vasylkov.steamparser.telegram.service;
 
 import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.general.interfaces.MessagesSender;
+import me.vasylkov.steamparser.parsing.entity.SteamSticker;
 import me.vasylkov.steamparser.parsing.entity.Sticker;
 import me.vasylkov.steamparser.telegram.configuration.TelegramProperties;
 import org.slf4j.Logger;
@@ -58,7 +59,7 @@ public class TelegramMessagesSender implements MessagesSender
     }
 
     @Override
-    public void sendProfitableItemData(String imgUrl, String hashName, double averageItemPrice, double currentPrice, int position, List<Sticker> stickers, double totalStickersPrice, double priceWithStickersMarkup, double stickersMarkupPercentage)
+    public void sendProfitableItemData(String imgUrl, String hashName, double averageItemPrice, double currentPrice, int position, List<Sticker> steamStickers, double totalStickersPrice, double priceWithStickersMarkup, double stickersMarkupPercentage)
     {
         StringBuilder captionBuilder = new StringBuilder();
 
@@ -68,9 +69,9 @@ public class TelegramMessagesSender implements MessagesSender
         captionBuilder.append("Позиция / страница: ").append(position).append("\n");
 
         captionBuilder.append("Стикеры:\n");
-        for (Sticker sticker : stickers) {
-            double roundedPrice = Math.round(sticker.getPrice() * 10.0) / 10.0;  // Округление до 1 десятой
-            captionBuilder.append(sticker.getHashName()).append(": (").append(roundedPrice).append(")\n");
+        for (Sticker steamSticker : steamStickers) {
+            double roundedPrice = Math.round(steamSticker.getPrice() * 10.0) / 10.0;  // Округление до 1 десятой
+            captionBuilder.append(steamSticker.getHashName()).append(": (").append(roundedPrice).append(")\n");
         }
 
         double roundedTotalStickersPrice = Math.round(totalStickersPrice * 10.0) / 10.0;
