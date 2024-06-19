@@ -1,8 +1,7 @@
 package me.vasylkov.steamparser.rest.controller;
 
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.parsing.service.SteamParsingService;
-import me.vasylkov.steamparser.parsing.service.SteamParsingTaskManager;
+import me.vasylkov.steamparser.parsing.component.ParsingTaskManager;
 import me.vasylkov.steamparser.rest.component.ResponseEntityConverter;
 import me.vasylkov.steamparser.rest.dto.MessageDTO;
 import org.springframework.http.HttpStatus;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SteamParsingController
 {
     private final ResponseEntityConverter<MessageDTO> responseEntityConverter;
-    private final SteamParsingTaskManager steamParsingTaskManager;
+    private final ParsingTaskManager steamParsingTaskManager;
 
     @GetMapping("/start")
     public ResponseEntity<?> startParsing()

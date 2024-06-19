@@ -1,16 +1,14 @@
-package me.vasylkov.steamparser.data.service;
+package me.vasylkov.steamparser.data.component;
 
 import jakarta.annotation.PostConstruct;
-import me.vasylkov.steamparser.data.component.ItemQueueManager;
-import me.vasylkov.steamparser.data.component.SteamItemUrlGenerator;
 import me.vasylkov.steamparser.data.configuration.DataProperties;
 import me.vasylkov.steamparser.data.entity.SteamItem;
-import me.vasylkov.steamparser.price_api.service.ItemPriceFetcher;
+import me.vasylkov.steamparser.price_api.component.ItemPriceFetcher;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 public class SteamItemListFiller implements ItemListFiller
 {
     private final SteamItemUrlGenerator steamItemUrlGenerator;

@@ -1,14 +1,15 @@
-package me.vasylkov.steamparser.parsing.service;
+package me.vasylkov.steamparser.parsing.component;
 
 import me.vasylkov.steamparser.data.entity.Item;
 import me.vasylkov.steamparser.data.entity.StickersModule;
 import me.vasylkov.steamparser.parsing.entity.*;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Component
 public class SteamPageAnalyser implements PageAnalyser
 {
     @Override

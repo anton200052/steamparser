@@ -1,18 +1,19 @@
-package me.vasylkov.steamparser.parsing.service;
+package me.vasylkov.steamparser.parsing.component;
 
 import me.vasylkov.steamparser.data.component.ItemQueueManager;
 import me.vasylkov.steamparser.data.component.SteamItemsQueueManager;
 import me.vasylkov.steamparser.data.entity.SteamItem;
 import me.vasylkov.steamparser.general.interfaces.MessagesSender;
-import me.vasylkov.steamparser.parsing.component.ParsingStatus;
-import me.vasylkov.steamparser.parsing.component.SteamParsingStatus;
 import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
+import me.vasylkov.steamparser.parsing.service.ParsingService;
+import me.vasylkov.steamparser.parsing.service.SteamParsingService;
 import me.vasylkov.steamparser.telegram.service.TelegramMessagesSender;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-@Service
+@Component
 public class SteamParsingTaskManager implements ParsingTaskManager
 {
     private final ItemQueueManager<SteamItem> steamItemsQueue;

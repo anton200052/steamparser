@@ -1,19 +1,19 @@
-package me.vasylkov.steamparser.parsing.service;
+package me.vasylkov.steamparser.parsing.component;
 
 import me.vasylkov.steamparser.data.component.SteamItemUrlGenerator;
-import me.vasylkov.steamparser.price_api.service.ItemPriceFetcher;
+import me.vasylkov.steamparser.price_api.component.ItemPriceFetcher;
 import me.vasylkov.steamparser.parsing.entity.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Component
 public class SteamPageDataParser implements PageDataParser
 {
     private final Logger logger;

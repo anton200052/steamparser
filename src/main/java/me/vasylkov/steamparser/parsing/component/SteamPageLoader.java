@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.parsing.service;
+package me.vasylkov.steamparser.parsing.component;
 
 import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
@@ -9,16 +9,18 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class SteamPageLoader
+public class SteamPageLoader implements PageLoader
 {
     private final Logger logger;
     private final ParsingProperties properties;
     private final WebDriverProxyChanger webDriverProxyChanger;
 
+    @Override
     public void loadPageByPageNum(WebDriverWrapper webDriverWrapper, String pageUrl, int pageNum)
     {
         PageLoadResult pageLoadResult = null;
@@ -30,7 +32,6 @@ public class SteamPageLoader
             }
             loadListings(webDriverWrapper, pageUrl);
             pageLoadResult = changePage(webDriverWrapper, pageNum);
-            System.out.println(pageLoadResult);
         } while (pageLoadResult != PageLoadResult.SUCCESS);
     }
 

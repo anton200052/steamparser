@@ -28,7 +28,7 @@ public class WebDriverProxyChanger
         {
             WebDriver driver = webDriverWrapper.getDriver();
             ProxyWrapper proxy = webDriverWrapper.getProxy();
-            ProxyWrapper unblockedProxy = proxyManager.getUnblockedProxy();
+            ProxyWrapper unblockedProxy = proxyManager.getAvailableProxy();
 
             if (proxy != null || unblockedProxy != null)
             {

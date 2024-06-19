@@ -1,8 +1,7 @@
-package me.vasylkov.steamparser.parsing.service;
+package me.vasylkov.steamparser.parsing.component;
 
 import me.vasylkov.steamparser.data.entity.Item;
 import me.vasylkov.steamparser.parsing.entity.AnalysingResult;
-import me.vasylkov.steamparser.parsing.entity.SteamAnalysingResult;
 import me.vasylkov.steamparser.parsing.entity.Page;
 
 public interface PageAnalyser

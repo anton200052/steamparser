@@ -1,20 +1,38 @@
 data:
   steam_items:
+    - hashName: "AWP | Safari Mesh (Field-Tested)"
+      maximalItemMarkupPercentage: 200.0
+      stickersModule:
+        enabled: true
+        minimalMarkupPercentage: 15.0
+        minimalStickerPrice: 30.0
+    - hashName: "Desert Eagle | Mudder (Field-Tested)"
+      maximalItemMarkupPercentage: 200.0
+      stickersModule:
+        enabled: true
+        minimalMarkupPercentage: 15.0
+        minimalStickerPrice: 30.0
+    - hashName: "AK-47 | Elite Build (Field-Tested)"
+      maximalItemMarkupPercentage: 20.0
+      stickersModule:
+        enabled: true
+        minimalMarkupPercentage: 15.0
+        minimalStickerPrice: 30.0
+    - hashName: "M4A1-S | Nitro (Field-Tested)"
+      maximalItemMarkupPercentage: 20.0
+      stickersModule:
+        enabled: true
+        minimalMarkupPercentage: 15.0
+        minimalStickerPrice: 30.0
     - hashName: "AK-47 | Slate (Field-Tested)"
       maximalItemMarkupPercentage: 20.0
       stickersModule:
         enabled: true
-        minimalMarkupPercentage: 0.0001
-        minimalStickerPrice: 10.0
-    - hashName: "AK-47 | Slate (Field-Tested)"
-      maximalItemMarkupPercentage: 20.0
+        minimalMarkupPercentage: 15.0
+        minimalStickerPrice: 30.0
+    - hashName: "M4A4 | Magnesium (Field-Tested)"
+      maximalItemMarkupPercentage: 50.0
       stickersModule:
         enabled: true
-        minimalMarkupPercentage: 0.0001
-        minimalStickerPrice: 10.0
-    - hashName: "AK-47 | Slate (Field-Tested)"
-      maximalItemMarkupPercentage: 20.0
-      stickersModule:
-        enabled: true
-        minimalMarkupPercentage: 0.0001
-        minimalStickerPrice: 10.0
+        minimalMarkupPercentage: 15.0
+        minimalStickerPrice: 30.0

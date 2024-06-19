@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.parsing.service;
+package me.vasylkov.steamparser.parsing.component;
 
 public interface ParsingTaskManager
 {

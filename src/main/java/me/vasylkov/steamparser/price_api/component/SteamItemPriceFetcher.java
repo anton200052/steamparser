@@ -1,10 +1,11 @@
-package me.vasylkov.steamparser.price_api.service;
+package me.vasylkov.steamparser.price_api.component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.price_api.configuration.PriceApiProperties;
 import org.slf4j.Logger;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -13,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class SteamItemPriceFetcher implements ItemPriceFetcher
 {
@@ -28,7 +29,7 @@ public class SteamItemPriceFetcher implements ItemPriceFetcher
     {
         pauseBeforeRequest();
         double price = getAveragePriceFromApi(priceApiUrl);
-        logger.info("Цена предмета: {}", price);
+        logger.info("Price: {}", price);
         return price;
     }
 
@@ -57,7 +58,7 @@ public class SteamItemPriceFetcher implements ItemPriceFetcher
         }
         catch (RestClientException e)
         {
-            logger.error("Не удалось получить данные по URL: {}. С причиной {}", priceApiUrl, e.getMessage());
+            logger.error("Не удалось получить данные из API цен на предметы. Проверьте работоспособность сервиса!");
         }
 
         return 0.0;

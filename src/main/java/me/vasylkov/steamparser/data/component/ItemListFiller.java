@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.data.service;
+package me.vasylkov.steamparser.data.component;
 
 public interface ItemListFiller
 {

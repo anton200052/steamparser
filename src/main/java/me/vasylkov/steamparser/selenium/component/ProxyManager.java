@@ -4,7 +4,6 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.selenium.configuration.SeleniumProperties;
 import me.vasylkov.steamparser.selenium.entity.ProxyWrapper;
-import org.openqa.selenium.Proxy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -38,9 +37,8 @@ public class ProxyManager
         }
     }
 
-    public synchronized ProxyWrapper getUnblockedProxy()
+    public synchronized ProxyWrapper getAvailableProxy()
     {
-        System.out.println(proxyList);
         for (ProxyWrapper proxyWrapper : proxyList)
         {
             if (!proxyWrapper.isBlocked())
