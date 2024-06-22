@@ -74,8 +74,7 @@ public class ChromeDriverFactory implements DriverFactory
         catch (Exception e)
         {
             logger.error("Ошибка при настройке ChromeOptions: ", e);
-            applicationShutdownManager.initiateShutdown(1);
-            return null;
+            throw new RuntimeException(e);
         }
     }
 }

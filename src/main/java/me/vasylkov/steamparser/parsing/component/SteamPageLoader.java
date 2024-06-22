@@ -68,14 +68,17 @@ public class SteamPageLoader implements PageLoader
         try
         {
             Thread.sleep(properties.getPageChangingDuration() * 1000L);
+            JavascriptExecutor javascriptExecutor = (JavascriptExecutor) webDriver;
+            javascriptExecutor.executeScript("g_oSearchResults.GoToPage(" + (pageNum - 1) + ")");
         }
         catch (InterruptedException e)
         {
-            logger.warn("Ошибка при ожидании перед сменой страницы", e);
+            logger.error("Ошибка при ожидании перед сменой страницы", e);
         }
-
-        JavascriptExecutor javascriptExecutor = (JavascriptExecutor) webDriver;
-        javascriptExecutor.executeScript("g_oSearchResults.GoToPage(" + (pageNum - 1) + ")");
+        catch (JavascriptException e)
+        {
+            logger.error("Ошибка при смене страницы листингов", e);
+        }
     }
 
     private PageLoadResult getPageChangingResult(WebDriverWait webDriverWait, int pageNum)
@@ -101,10 +104,14 @@ public class SteamPageLoader implements PageLoader
                 webDriverWait.until(driver -> driver.findElement(By.className("info")).getText().startsWith(pageNum + " from"));
                 return PageLoadResult.SUCCESS;
             }
-            catch (TimeoutException | StaleElementReferenceException empty)
+            catch (TimeoutException | StaleElementReferenceException ex)
             {
                 return PageLoadResult.UNKNOWN_ERROR;
             }
+        }
+        catch (StaleElementReferenceException e)
+        {
+            return PageLoadResult.UNKNOWN_ERROR;
         }
     }
 }

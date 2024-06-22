@@ -57,7 +57,6 @@ public class SteamParsingService implements ParsingService
             while (parsingStatus.isParsingStarted())
             {
                 Item currentAvailable = itemQueueManager.getNextAvailable();
-
                 if (currentAvailable == null)
                 {
                     if (lastAvailable == null || !parsingProperties.isCycling())
@@ -68,7 +67,6 @@ public class SteamParsingService implements ParsingService
                     }
                     currentAvailable = lastAvailable;
                 }
-
                 currentAvailable.setAvailable(false);
 
                 parseItem(currentAvailable, webDriverWrapper);
@@ -84,7 +82,7 @@ public class SteamParsingService implements ParsingService
         }
         catch (Exception e)
         {
-            logger.info("Exception occurred while parsing task", e);
+            logger.info("Произошла критическая ошибка парсинга. К сожалению поток будет остановлен", e);
         }
         finally
         {
@@ -97,7 +95,6 @@ public class SteamParsingService implements ParsingService
 
     private void parseItem(Item item, WebDriverWrapper webDriverWrapper)
     {
-        logger.info("Thread: {}", Thread.currentThread().getId());
         SteamItem steamItem = (SteamItem) item;
         logger.info("Начинаем парсинг предмета {}", steamItem.getHashName());
         boolean priceExceedsMarkup = false;
