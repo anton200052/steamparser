@@ -4,8 +4,8 @@ import me.vasylkov.steamparser.data.entity.Item;
 
 public interface ItemQueueManager<T extends Item>
 {
-    T getNextAvailable();
+    T getAndBlockFirstAvailableItem();
 
     void addItem(T item);
-    void moveToLast(T item);
+    void moveItemToLastAndUnblock(T item);
 }

@@ -15,13 +15,13 @@ public class SteamItemsQueueManager implements ItemQueueManager<SteamItem>
     private ConcurrentLinkedDeque<SteamItem> items = new ConcurrentLinkedDeque<>();
 
     @Override
-    public synchronized SteamItem getNextAvailable()
+    public synchronized SteamItem getAndBlockFirstAvailableItem()
     {
-        System.out.println(items);
         for (SteamItem item : items)
         {
             if (item.isAvailable())
             {
+                item.setAvailable(false);
                 return item;
             }
         }
@@ -35,8 +35,9 @@ public class SteamItemsQueueManager implements ItemQueueManager<SteamItem>
     }
 
     @Override
-    public synchronized void moveToLast(SteamItem item)
+    public synchronized void moveItemToLastAndUnblock(SteamItem item)
     {
+        item.setAvailable(true);
         items.remove(item);
         items.addLast(item);
     }

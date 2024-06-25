@@ -1,17 +1,5 @@
 data:
   steam_items:
-    - hashName: "AWP | Safari Mesh (Field-Tested)"
-      maximalItemMarkupPercentage: 200.0
-      stickersModule:
-        enabled: true
-        minimalMarkupPercentage: 15.0
-        minimalStickerPrice: 30.0
-    - hashName: "Desert Eagle | Mudder (Field-Tested)"
-      maximalItemMarkupPercentage: 200.0
-      stickersModule:
-        enabled: true
-        minimalMarkupPercentage: 15.0
-        minimalStickerPrice: 30.0
     - hashName: "AK-47 | Elite Build (Field-Tested)"
       maximalItemMarkupPercentage: 20.0
       stickersModule:

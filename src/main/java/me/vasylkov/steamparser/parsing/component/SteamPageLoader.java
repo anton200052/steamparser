@@ -23,15 +23,16 @@ public class SteamPageLoader implements PageLoader
     @Override
     public void loadPageByPageNum(WebDriverWrapper webDriverWrapper, String pageUrl, int pageNum)
     {
-        PageLoadResult pageLoadResult = null;
+        PageLoadResult pageLoadResult;
         do
         {
-            if (pageLoadResult == PageLoadResult.TOO_MANY_REQUESTS)
+            loadListings(webDriverWrapper, pageUrl);
+            pageLoadResult = changePage(webDriverWrapper, pageNum);
+
+            if (pageLoadResult == PageLoadResult.TOO_MANY_REQUESTS || !isExtensionLoaded(webDriverWrapper.getWebDriverWait()))
             {
                 webDriverProxyChanger.changeProxyAndWebDriver(webDriverWrapper);
             }
-            loadListings(webDriverWrapper, pageUrl);
-            pageLoadResult = changePage(webDriverWrapper, pageNum);
         } while (pageLoadResult != PageLoadResult.SUCCESS);
     }
 
@@ -47,6 +48,19 @@ public class SteamPageLoader implements PageLoader
         while (!webDriver.getCurrentUrl().equals(pageUrl) || !hasListings(webDriverWrapper.getWebDriverWait()))
         {
             webDriver.get(pageUrl);
+        }
+    }
+
+    private boolean isExtensionLoaded(WebDriverWait webDriverWait)
+    {
+        try
+        {
+            webDriverWait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".sih")));
+            return true;
+        }
+        catch (TimeoutException ignore)
+        {
+            return false;
         }
     }
 

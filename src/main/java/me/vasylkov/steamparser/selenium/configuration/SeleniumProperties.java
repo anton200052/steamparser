@@ -14,8 +14,6 @@ import java.util.List;
 public class SeleniumProperties {
 
     private String profilePath;
-    private String driverPath;
-    private String extensionPath;
     private int driverTimeout;
     private String browser;
     private List<String> proxyList;

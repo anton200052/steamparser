@@ -56,7 +56,7 @@ public class SteamParsingService implements ParsingService
             Item lastAvailable = null;
             while (parsingStatus.isParsingStarted())
             {
-                Item currentAvailable = itemQueueManager.getNextAvailable();
+                Item currentAvailable = itemQueueManager.getAndBlockFirstAvailableItem();
                 if (currentAvailable == null)
                 {
                     if (lastAvailable == null || !parsingProperties.isCycling())
@@ -67,14 +67,12 @@ public class SteamParsingService implements ParsingService
                     }
                     currentAvailable = lastAvailable;
                 }
-                currentAvailable.setAvailable(false);
 
                 parseItem(currentAvailable, webDriverWrapper);
 
                 if (parsingProperties.isCycling())
                 {
-                    currentAvailable.setAvailable(true);
-                    itemQueueManager.moveToLast((SteamItem) currentAvailable);
+                    itemQueueManager.moveItemToLastAndUnblock((SteamItem) currentAvailable);
                 }
 
                 lastAvailable = currentAvailable;
@@ -88,7 +86,7 @@ public class SteamParsingService implements ParsingService
         {
             if (webDriverWrapper != null)
             {
-                webDriverWrapper.getDriver().close();
+                webDriverWrapper.getDriver().quit();
             }
         }
     }
