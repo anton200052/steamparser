@@ -2,9 +2,12 @@ package me.vasylkov.steamparser.parsing.component;
 
 import me.vasylkov.steamparser.data.entity.Item;
 import me.vasylkov.steamparser.data.entity.StickersModule;
-import me.vasylkov.steamparser.parsing.entity.*;
+import me.vasylkov.steamparser.parsing.entity.AnalysingResult;
+import me.vasylkov.steamparser.parsing.entity.Listing;
+import me.vasylkov.steamparser.parsing.entity.Page;
+import me.vasylkov.steamparser.parsing.entity.Sticker;
+import me.vasylkov.steamparser.parsing.entity.SteamAnalysingResult;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +19,7 @@ public class SteamPageAnalyser implements PageAnalyser
     public AnalysingResult analysePage(Page page, Item item)
     {
         List<Listing> profitableSteamListings = getProfitableListingsIfPresent(page, item);
-        boolean priceExceedsMaxItemMarkup = hasListingsPriceThreshold(page, item);
-        return new SteamAnalysingResult(profitableSteamListings, priceExceedsMaxItemMarkup);
+        return new SteamAnalysingResult(profitableSteamListings);
     }
 
     private List<Listing> getProfitableListingsIfPresent(Page page, Item item)
@@ -25,11 +27,6 @@ public class SteamPageAnalyser implements PageAnalyser
         List<Listing> profitableListings = new ArrayList<>();
         for (Listing listing : page.getListings())
         {
-            if (listing.getPrice() > calculatePriceThreshold(item))
-            {
-                break;
-            }
-
             if (item.getStickersModule() != null && item.getStickersModule().isValid())
             {
                 analyseStickers(listing, item, profitableListings);
@@ -41,36 +38,35 @@ public class SteamPageAnalyser implements PageAnalyser
     private void analyseStickers(Listing listing, Item item, List<Listing> profitableListings)
     {
         StickersModule stickersModule = item.getStickersModule();
-        double totalStickersPrice = calculateTotalStickersPrice(listing.getStickers(), stickersModule.getMinimalStickerPrice());
+        double totalStickersPrice = calculateTotalStickersPrice(listing.getStickers());
         double currentItemPrice = listing.getPrice();
         double averageItemPrice = item.getAveragePrice();
 
-        if (isItemPriceNotExceedingAverage(averageItemPrice, currentItemPrice))
+        if (totalStickersPrice < stickersModule.getMinimalStickersPrice())
+        {
+            return;
+        }
+
+        if (!isItemPriceExceedingAverage(averageItemPrice, currentItemPrice))
         {
             averageItemPrice = currentItemPrice;
         }
 
         double averageStickersMarkup = calculateAverageStickersMarkup(totalStickersPrice, averageItemPrice);
         double itemMarkup = calculateItemMarkupByStickers(averageStickersMarkup, currentItemPrice);
+        listing.setPriceWithStickersMarkup(averageStickersMarkup);
+        listing.setStickersMarkupPercentage(itemMarkup);
 
-        if (itemMarkup >= stickersModule.getMinimalMarkupPercentage())
-        {
-            listing.setPriceWithStickersMarkup(averageStickersMarkup);
-            listing.setStickersMarkupPercentage(itemMarkup);
-            profitableListings.add(listing);
-        }
+        profitableListings.add(listing);
     }
 
-    private double calculateTotalStickersPrice(List<Sticker> steamStickers, double minimalStickersPrice)
+    private double calculateTotalStickersPrice(List<Sticker> steamStickers)
     {
         double totalStickersPrice = 0.0;
         for (Sticker steamSticker : steamStickers)
         {
             double price = steamSticker.getPrice();
-            if (price >= minimalStickersPrice)
-            {
-                totalStickersPrice += price;
-            }
+            totalStickersPrice += price;
         }
         return totalStickersPrice;
     }
@@ -87,29 +83,8 @@ public class SteamPageAnalyser implements PageAnalyser
     }
 
 
-    private boolean hasListingsPriceThreshold(Page page, Item item)
+    private boolean isItemPriceExceedingAverage(double averageItemPrice, double currentItemPrice)
     {
-        double priceThreshold = calculatePriceThreshold(item);
-        for (Listing listing : page.getListings())
-        {
-            if (listing.getPrice() > priceThreshold)
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    private double calculatePriceThreshold(Item item)
-    {
-        double medianPrice = item.getAveragePrice();
-        double maximumItemMarkup = item.getMaximalItemMarkupPercentage();
-        return medianPrice * (1 + maximumItemMarkup / 100.0);
-    }
-
-    private boolean isItemPriceNotExceedingAverage(double averageItemPrice, double currentItemPrice)
-    {
-        return currentItemPrice <= averageItemPrice;
+        return currentItemPrice > averageItemPrice;
     }
 }

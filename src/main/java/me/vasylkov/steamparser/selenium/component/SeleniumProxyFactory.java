@@ -2,6 +2,8 @@ package me.vasylkov.steamparser.selenium.component;
 
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
+import me.vasylkov.steamparser.common.abstraction.ProxyFactory;
+import me.vasylkov.steamparser.selenium.entity.SeleniumProxyWrapper;
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 import net.lightbody.bmp.client.ClientUtil;
@@ -16,12 +18,13 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class ProxyFactory
+public class SeleniumProxyFactory implements ProxyFactory<SeleniumProxyWrapper>
 {
     private final Logger logger;
     private final List<BrowserMobProxy> proxiesNeedToStop = new ArrayList<>();
 
-    public Proxy createDefaultProxy(String host, int port)
+    @Override
+    public SeleniumProxyWrapper createDefaultProxy(String host, int port)
     {
         String proxyStr = host + ":" + port;
 
@@ -30,10 +33,11 @@ public class ProxyFactory
         proxy.setSslProxy(proxyStr);
 
         logger.info("Добавлено прокси без аутентификации с адресом {}", host + ":" + port);
-        return proxy;
+        return new SeleniumProxyWrapper(proxy, false);
     }
 
-    public Proxy createAuthProxy(String host, int port, String username, String password)
+    @Override
+    public SeleniumProxyWrapper createAuthProxy(String host, int port, String username, String password)
     {
         BrowserMobProxy proxy = new BrowserMobProxyServer();
         proxy.setChainedProxy(new InetSocketAddress(host, port));
@@ -42,7 +46,7 @@ public class ProxyFactory
 
         proxiesNeedToStop.add(proxy);
         logger.info("Добавлено прокси с аутентификацией с адресом {}", host + ":" + port);
-        return ClientUtil.createSeleniumProxy(proxy);
+        return new SeleniumProxyWrapper(ClientUtil.createSeleniumProxy(proxy), false);
     }
 
     @PreDestroy

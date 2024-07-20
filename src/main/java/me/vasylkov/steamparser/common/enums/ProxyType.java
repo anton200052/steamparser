@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.selenium.entity;
+package me.vasylkov.steamparser.common.enums;
 
 public enum ProxyType
 {

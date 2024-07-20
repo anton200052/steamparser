@@ -1,8 +1,7 @@
 package me.vasylkov.steamparser.selenium.component;
 
-import me.vasylkov.steamparser.general.component.TempFilesCleaner;
 import me.vasylkov.steamparser.selenium.configuration.SeleniumProperties;
-import me.vasylkov.steamparser.selenium.entity.ProxyWrapper;
+import me.vasylkov.steamparser.selenium.entity.SeleniumProxyWrapper;
 import me.vasylkov.steamparser.selenium.entity.WebDriverWrapper;
 import org.openqa.selenium.WebDriver;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,23 +10,22 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 @Component
 public class WebDriverProxyChanger
 {
     @Qualifier("chromeDriverFactory")
     private final DriverFactory driverFactory;
-    private final ProxyManager proxyManager;
+    private final SeleniumProxyManager seleniumProxyManager;
     private final SeleniumProperties properties;
-    private final TempFilesCleaner tempFilesCleaner;
+    private final SeleniumTempFilesCleaner seleniumTempFilesCleaner;
 
-    public WebDriverProxyChanger(DriverFactory driverFactory, ProxyManager proxyManager, SeleniumProperties properties, TempFilesCleaner tempFilesCleaner)
+    public WebDriverProxyChanger(DriverFactory driverFactory, SeleniumProxyManager seleniumProxyManager, SeleniumProperties properties, SeleniumTempFilesCleaner seleniumTempFilesCleaner)
     {
         this.driverFactory = driverFactory;
-        this.proxyManager = proxyManager;
+        this.seleniumProxyManager = seleniumProxyManager;
         this.properties = properties;
-        this.tempFilesCleaner = tempFilesCleaner;
+        this.seleniumTempFilesCleaner = seleniumTempFilesCleaner;
     }
 
     public void changeProxyAndWebDriver(WebDriverWrapper webDriverWrapper)
@@ -35,13 +33,13 @@ public class WebDriverProxyChanger
         if (properties.isProxiesEnabled())
         {
             WebDriver driver = webDriverWrapper.getDriver();
-            ProxyWrapper proxy = webDriverWrapper.getProxy();
+            SeleniumProxyWrapper proxy = webDriverWrapper.getProxy();
             if (proxy != null)
             {
-                proxyManager.blockProxy(proxy);
+                seleniumProxyManager.blockProxy(proxy);
             }
 
-            ProxyWrapper unblockedProxy = proxyManager.getAvailableProxy();
+            SeleniumProxyWrapper unblockedProxy = seleniumProxyManager.getAvailableProxy();
 
             if (proxy != null || unblockedProxy != null)
             {
@@ -52,7 +50,7 @@ public class WebDriverProxyChanger
                     {
                         if (Files.isDirectory(tempFile))
                         {
-                            tempFilesCleaner.deleteDirectoryAndContents(tempFile);
+                            seleniumTempFilesCleaner.deleteDirectoryAndContents(tempFile);
                         }
                         else
                         {

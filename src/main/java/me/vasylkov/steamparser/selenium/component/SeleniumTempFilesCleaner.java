@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.general.component;
+package me.vasylkov.steamparser.selenium.component;
 
 import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Component;
@@ -8,7 +8,7 @@ import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
 @Component
-public class TempFilesCleaner
+public class SeleniumTempFilesCleaner
 {
     private static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
     private static final String FILE_PREFIX = "checker";

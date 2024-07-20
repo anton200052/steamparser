@@ -3,9 +3,9 @@ package me.vasylkov.steamparser.selenium.component;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import me.vasylkov.steamparser.selenium.entity.SeleniumProxyWrapper;
 import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
 import me.vasylkov.steamparser.selenium.configuration.SeleniumProperties;
-import me.vasylkov.steamparser.selenium.entity.ProxyWrapper;
 import me.vasylkov.steamparser.selenium.entity.WebDriverWrapper;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -29,20 +29,20 @@ public class ChromeDriverFactory implements DriverFactory
 {
     private final SeleniumProperties properties;
     private final Logger logger;
-    private final ParsingProperties parsingProperties;
+    private final SeleniumProperties seleniumProperties;
     private final ResourceLoader resourceLoader;
 
     @Override
-    public synchronized WebDriverWrapper createWebDriver(ProxyWrapper proxyWrapper)
+    public synchronized WebDriverWrapper createWebDriver(SeleniumProxyWrapper seleniumProxyWrapper)
     {
         List<Path> tempFiles = new ArrayList<>();
 
-        ChromeDriver chromeDriver = new ChromeDriver(createBrowserOptions(proxyWrapper, tempFiles));
-        WebDriverWait webDriverWait = new WebDriverWait(chromeDriver, Duration.ofSeconds(parsingProperties.getElementsWaitingDuration()));
-        return new WebDriverWrapper(chromeDriver, proxyWrapper, webDriverWait, tempFiles);
+        ChromeDriver chromeDriver = new ChromeDriver(createBrowserOptions(seleniumProxyWrapper, tempFiles));
+        WebDriverWait webDriverWait = new WebDriverWait(chromeDriver, Duration.ofSeconds(seleniumProperties.getElementsWaitingDuration()));
+        return new WebDriverWrapper(chromeDriver, seleniumProxyWrapper, webDriverWait, tempFiles);
     }
 
-    private ChromeOptions createBrowserOptions(ProxyWrapper proxyWrapper, List<Path> tempFiles)
+    private ChromeOptions createBrowserOptions(SeleniumProxyWrapper seleniumProxyWrapper, List<Path> tempFiles)
     {
         try
         {
@@ -78,9 +78,9 @@ public class ChromeDriverFactory implements DriverFactory
             options.addArguments("--ignore-certificate-errors");
             options.addArguments("user-data-dir=" + tempDir.toString());
 
-            if (proxyWrapper != null)
+            if (seleniumProxyWrapper != null)
             {
-                options.setProxy(proxyWrapper.getProxy());
+                options.setProxy(seleniumProxyWrapper.getProxy());
             }
 
             return options;

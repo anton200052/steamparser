@@ -1,8 +1,11 @@
 package me.vasylkov.steamparser.parsing.component;
 
-public interface ParsingStatus
-{
-    boolean isParsingStarted();
+import lombok.Data;
+import org.springframework.stereotype.Component;
 
-    void setParsingStarted(boolean parsingStarted);
+@Component
+@Data
+public class ParsingStatus
+{
+    private volatile boolean isParsingStarted = false;
 }

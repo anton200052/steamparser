@@ -1,8 +1,14 @@
-package me.vasylkov.steamparser.parsing.component;
+package me.vasylkov.steamparser.selenium.component;
 
 import me.vasylkov.steamparser.data.component.SteamItemUrlGenerator;
+import me.vasylkov.steamparser.parsing.entity.Listing;
+import me.vasylkov.steamparser.parsing.entity.Page;
+import me.vasylkov.steamparser.parsing.entity.Sticker;
+import me.vasylkov.steamparser.parsing.entity.SteamListing;
+import me.vasylkov.steamparser.parsing.entity.SteamPage;
+import me.vasylkov.steamparser.parsing.entity.SteamSticker;
+import me.vasylkov.steamparser.parsing.enums.PageNumType;
 import me.vasylkov.steamparser.price_api.component.ItemPriceFetcher;
-import me.vasylkov.steamparser.parsing.entity.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
@@ -16,7 +22,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Component
-public class SteamPageDataParser implements PageDataParser
+public class SteamSeleniumPageDataParser implements SeleniumPageDataParser
 {
     private final Logger logger;
     private final SteamItemUrlGenerator steamItemUrlGenerator;
@@ -24,7 +30,7 @@ public class SteamPageDataParser implements PageDataParser
     @Qualifier("steamItemPriceFetcher")
     private final ItemPriceFetcher itemPriceFetcher;
 
-    public SteamPageDataParser(Logger logger, SteamItemUrlGenerator steamItemUrlGenerator, ItemPriceFetcher itemPriceFetcher)
+    public SteamSeleniumPageDataParser(Logger logger, SteamItemUrlGenerator steamItemUrlGenerator, ItemPriceFetcher itemPriceFetcher)
     {
         this.logger = logger;
         this.steamItemUrlGenerator = steamItemUrlGenerator;

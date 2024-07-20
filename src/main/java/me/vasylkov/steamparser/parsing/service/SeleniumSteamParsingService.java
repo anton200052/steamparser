@@ -3,11 +3,16 @@ package me.vasylkov.steamparser.parsing.service;
 import me.vasylkov.steamparser.data.component.ItemQueueManager;
 import me.vasylkov.steamparser.data.entity.Item;
 import me.vasylkov.steamparser.data.entity.SteamItem;
-import me.vasylkov.steamparser.general.interfaces.MessagesSender;
-import me.vasylkov.steamparser.parsing.component.*;
-import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
-import me.vasylkov.steamparser.parsing.entity.*;
+import me.vasylkov.steamparser.common.abstraction.MessagesSender;
+import me.vasylkov.steamparser.parsing.component.PageAnalyser;
+import me.vasylkov.steamparser.selenium.component.SeleniumPageDataParser;
+import me.vasylkov.steamparser.selenium.component.SteamSeleniumPageLoader;
+import me.vasylkov.steamparser.parsing.component.ParsingStatus;
+import me.vasylkov.steamparser.parsing.entity.AnalysingResult;
+import me.vasylkov.steamparser.parsing.entity.Listing;
+import me.vasylkov.steamparser.parsing.entity.SteamPage;
 import me.vasylkov.steamparser.selenium.component.ChromeDriverFactory;
+import me.vasylkov.steamparser.selenium.configuration.SeleniumProperties;
 import me.vasylkov.steamparser.selenium.entity.WebDriverWrapper;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,39 +20,44 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SteamParsingService implements ParsingService
+public class SeleniumSteamParsingService implements ParsingService
 {
     private final Logger logger;
 
-    @Qualifier("steamPageDataParser")
-    private final PageDataParser pageDataParser;
-    private final SteamPageLoader steamPageLoader;
+    @Qualifier("steamSeleniumPageDataParser")
+    private final SeleniumPageDataParser seleniumPageDataParser;
+    private final SteamSeleniumPageLoader steamPageLoader;
     @Qualifier("steamPageAnalyser")
     private final PageAnalyser pageAnalyser;
     @Qualifier("telegramMessagesSender")
     private final MessagesSender messagesSender;
-    @Qualifier("steamParsingStatus")
+    @Qualifier("parsingStatus")
     private final ParsingStatus parsingStatus;
-    private final ParsingProperties parsingProperties;
+    private final SeleniumProperties seleniumProperties;
     private final ItemQueueManager<SteamItem> itemQueueManager;
     private final ChromeDriverFactory chromeDriverFactory;
 
-    public SteamParsingService(Logger logger, PageDataParser pageDataParser, SteamPageLoader steamPageLoader, PageAnalyser pageAnalyser, MessagesSender messagesSender, SteamParsingStatus parsingStatus, ParsingProperties parsingProperties, ItemQueueManager<SteamItem> itemQueueManager, ChromeDriverFactory chromeDriverFactory)
+    public SeleniumSteamParsingService(Logger logger, SeleniumPageDataParser seleniumPageDataParser, SteamSeleniumPageLoader steamPageLoader, PageAnalyser pageAnalyser, MessagesSender messagesSender, ParsingStatus parsingStatus, SeleniumProperties seleniumProperties, ItemQueueManager<SteamItem> itemQueueManager, ChromeDriverFactory chromeDriverFactory)
     {
         this.logger = logger;
-        this.pageDataParser = pageDataParser;
+        this.seleniumPageDataParser = seleniumPageDataParser;
         this.steamPageLoader = steamPageLoader;
         this.pageAnalyser = pageAnalyser;
         this.messagesSender = messagesSender;
         this.parsingStatus = parsingStatus;
-        this.parsingProperties = parsingProperties;
+        this.seleniumProperties = seleniumProperties;
         this.itemQueueManager = itemQueueManager;
         this.chromeDriverFactory = chromeDriverFactory;
     }
 
     @Async
     @Override
-    public void executeAsyncParsingTask()
+    public void executeParsingTask()
+    {
+        parseItems();
+    }
+
+    private void parseItems()
     {
         WebDriverWrapper webDriverWrapper = null;
         try
@@ -56,26 +66,11 @@ public class SteamParsingService implements ParsingService
             Item lastAvailable = null;
             while (parsingStatus.isParsingStarted())
             {
-                Item currentAvailable = itemQueueManager.getAndBlockFirstAvailableItem();
-                if (currentAvailable == null)
+                lastAvailable = processNextAvailableItem(webDriverWrapper, lastAvailable);
+                if (lastAvailable == null)
                 {
-                    if (lastAvailable == null || !parsingProperties.isCycling())
-                    {
-                        logger.info("Задач для потока {} нет, поток не будет продолжать работу", Thread.currentThread().getId());
-                        webDriverWrapper.getDriver().close();
-                        return;
-                    }
-                    currentAvailable = lastAvailable;
+                    return;
                 }
-
-                parseItem(currentAvailable, webDriverWrapper);
-
-                if (parsingProperties.isCycling())
-                {
-                    itemQueueManager.moveItemToLastAndUnblock((SteamItem) currentAvailable);
-                }
-
-                lastAvailable = currentAvailable;
             }
         }
         catch (Exception e)
@@ -91,14 +86,44 @@ public class SteamParsingService implements ParsingService
         }
     }
 
+    private Item processNextAvailableItem(WebDriverWrapper webDriverWrapper, Item lastAvailable)
+    {
+        Item currentAvailable = getCurrentAvailable(lastAvailable);
+        if (currentAvailable != null)
+        {
+            parseItem(currentAvailable, webDriverWrapper);
+
+            if (seleniumProperties.isCycleParsing())
+            {
+                itemQueueManager.moveItemToLastAndUnblock((SteamItem) currentAvailable);
+            }
+        }
+
+        return currentAvailable;
+    }
+
+    private Item getCurrentAvailable(Item lastAvailable)
+    {
+        Item currentAvailable = itemQueueManager.getAndBlockFirstAvailableItem();
+        if (currentAvailable == null)
+        {
+            if (lastAvailable == null || !seleniumProperties.isCycleParsing())
+            {
+                logger.info("Задач для потока {} нет, поток не будет продолжать работу", Thread.currentThread().getId());
+                return null;
+            }
+            currentAvailable = lastAvailable;
+        }
+        return currentAvailable;
+    }
+
     private void parseItem(Item item, WebDriverWrapper webDriverWrapper)
     {
         SteamItem steamItem = (SteamItem) item;
         logger.info("Начинаем парсинг предмета {}", steamItem.getHashName());
-        boolean priceExceedsMarkup = false;
         int currentPageNum = 1;
 
-        while (!priceExceedsMarkup)
+        while (currentPageNum <= item.getMaximalPage())
         {
             if (!parsingStatus.isParsingStarted())
             {
@@ -106,7 +131,7 @@ public class SteamParsingService implements ParsingService
             }
 
             steamPageLoader.loadPageByPageNum(webDriverWrapper, steamItem.getListingsUrl(), currentPageNum);
-            SteamPage steamPage = (SteamPage) pageDataParser.parsePageDataToObject(webDriverWrapper.getDriver());
+            SteamPage steamPage = (SteamPage) seleniumPageDataParser.parsePageDataToObject(webDriverWrapper.getDriver());
             AnalysingResult steamAnalysingResult = pageAnalyser.analysePage(steamPage, steamItem);
 
             for (Listing listing : steamAnalysingResult.getProfitableListings())
@@ -114,7 +139,6 @@ public class SteamParsingService implements ParsingService
                 messagesSender.sendProfitableItemData(listing.getImgUrl(), listing.getHashName(), item.getAveragePrice(), listing.getPrice(), currentPageNum, listing.getStickers(), listing.getTotalStickersPrice(), listing.getPriceWithStickersMarkup(), listing.getStickersMarkupPercentage());
             }
 
-            priceExceedsMarkup = steamAnalysingResult.isPriceExceedsMaxItemMarkup();
             currentPageNum = currentPageNum + 1;
         }
     }

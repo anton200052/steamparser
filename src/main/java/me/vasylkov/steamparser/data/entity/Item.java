@@ -11,12 +11,12 @@ public interface Item extends Validable
     String getListingsUrl();
     void setListingsUrl(String listingsUrl);
 
-    Double getMaximalItemMarkupPercentage();
-    void setMaximalItemMarkupPercentage(Double maximalItemMarkupPercentage);
+    Integer getMaximalPage();
+    void setMaximalPage(Integer maximalPage);
 
     StickersModule getStickersModule();
     void setStickersModule(StickersModule stickersModule);
 
-    boolean isAvailable();
-    void setAvailable(boolean available);
+    Boolean getAvailable();
+    void setAvailable(Boolean available);
 }

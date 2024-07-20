@@ -19,4 +19,9 @@ public class SeleniumProperties {
     private List<String> proxyList;
     private boolean proxiesEnabled;
     private int proxiesBlockingTime;
+    private String steamCurrencyCode;
+    private int elementsWaitingDuration;
+    private int pageChangingDuration;
+    private boolean cycleParsing;
+    private int threadsValue;
 }

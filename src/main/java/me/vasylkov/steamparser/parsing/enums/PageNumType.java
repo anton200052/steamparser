@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.parsing.entity;
+package me.vasylkov.steamparser.parsing.enums;
 
 public enum PageNumType
 {

@@ -10,5 +10,4 @@ import java.util.List;
 public class SteamAnalysingResult implements AnalysingResult
 {
     private List<Listing> profitableListings;
-    private boolean priceExceedsMaxItemMarkup;
 }

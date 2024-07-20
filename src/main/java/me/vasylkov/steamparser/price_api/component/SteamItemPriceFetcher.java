@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.price_api.configuration.PriceApiProperties;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 

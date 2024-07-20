@@ -1,11 +1,11 @@
 package me.vasylkov.steamparser.selenium.component;
 
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.selenium.entity.ProxyType;
-import me.vasylkov.steamparser.selenium.entity.ProxyWrapper;
+import me.vasylkov.steamparser.selenium.entity.SeleniumProxyWrapper;
+import me.vasylkov.steamparser.common.component.ProxyValidator;
+import me.vasylkov.steamparser.common.enums.ProxyType;
 import org.openqa.selenium.Proxy;
 import org.slf4j.Logger;
-import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -14,16 +14,16 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class ProxyListConverter implements Converter<List<String>, List<ProxyWrapper>>
+public class SeleniumProxyListConverter implements Converter<List<String>, List<SeleniumProxyWrapper>>
 {
     private final ProxyValidator proxyValidator;
-    private final ProxyFactory proxyManager;
+    private final SeleniumProxyFactory proxyManager;
     private final Logger logger;
 
     @Override
-    public List<ProxyWrapper> convert(List<String> source)
+    public List<SeleniumProxyWrapper> convert(List<String> source)
     {
-        List<ProxyWrapper> proxies = new ArrayList<>();
+        List<SeleniumProxyWrapper> proxies = new ArrayList<>();
         logger.info("Добавляем прокси.");
 
         for (String proxyString : source)
@@ -41,7 +41,7 @@ public class ProxyListConverter implements Converter<List<String>, List<ProxyWra
             String address = ipAndPort[0];
             int port = Integer.parseInt(ipAndPort[1]);
 
-            Proxy proxy;
+            SeleniumProxyWrapper proxy;
             if (proxyType == ProxyType.DEFAULT)
             {
                 proxy = proxyManager.createDefaultProxy(address, port);
@@ -51,7 +51,7 @@ public class ProxyListConverter implements Converter<List<String>, List<ProxyWra
                 String[] usernameAndPassword = parts[1].split(":");
                 proxy = proxyManager.createAuthProxy(address, port, usernameAndPassword[0], usernameAndPassword[1]);
             }
-            proxies.add(new ProxyWrapper(proxy, false));
+            proxies.add(proxy);
         }
         return proxies;
     }

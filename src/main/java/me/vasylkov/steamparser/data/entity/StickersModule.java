@@ -2,7 +2,6 @@ package me.vasylkov.steamparser.data.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -11,17 +10,16 @@ import lombok.NoArgsConstructor;
 public class StickersModule implements Module
 {
     private Boolean enabled;
-    private Double minimalMarkupPercentage;
-    private Double minimalStickerPrice;
+    private Double minimalStickersPrice;
 
     @Override
     public boolean isValid()
     {
-        return (enabled == null || !enabled) || (enabled && !hasAnyFieldNull());
+        return !hasAnyRequiredFieldNull();
     }
 
-    private boolean hasAnyFieldNull()
+    private boolean hasAnyRequiredFieldNull()
     {
-        return minimalMarkupPercentage == null || minimalStickerPrice == null;
+        return minimalStickersPrice == null || enabled == null;
     }
 }

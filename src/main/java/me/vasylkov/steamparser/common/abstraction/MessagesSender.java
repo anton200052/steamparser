@@ -1,6 +1,5 @@
-package me.vasylkov.steamparser.general.interfaces;
+package me.vasylkov.steamparser.common.abstraction;
 
-import me.vasylkov.steamparser.parsing.entity.SteamSticker;
 import me.vasylkov.steamparser.parsing.entity.Sticker;
 
 import java.util.List;

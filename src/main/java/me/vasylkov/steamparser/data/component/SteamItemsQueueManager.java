@@ -2,24 +2,39 @@ package me.vasylkov.steamparser.data.component;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import me.vasylkov.steamparser.data.configuration.DataProperties;
 import me.vasylkov.steamparser.data.entity.SteamItem;
+import me.vasylkov.steamparser.price_api.component.ItemPriceFetcher;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Component
-@RequiredArgsConstructor
 @Data
 public class SteamItemsQueueManager implements ItemQueueManager<SteamItem>
 {
-    private ConcurrentLinkedDeque<SteamItem> items = new ConcurrentLinkedDeque<>();
+    private final SteamItemUrlGenerator steamItemUrlGenerator;
+    private final DataProperties dataProperties;
+    private final Logger logger;
+    @Qualifier("steamItemPriceFetcher")
+    private final ItemPriceFetcher steamItemPriceFetcher;
+
+    public SteamItemsQueueManager(SteamItemUrlGenerator steamItemUrlGenerator, DataProperties dataProperties, Logger logger, ItemPriceFetcher steamItemPriceFetcher)
+    {
+        this.steamItemUrlGenerator = steamItemUrlGenerator;
+        this.dataProperties = dataProperties;
+        this.logger = logger;
+        this.steamItemPriceFetcher = steamItemPriceFetcher;
+    }
 
     @Override
     public synchronized SteamItem getAndBlockFirstAvailableItem()
     {
-        for (SteamItem item : items)
+        for (SteamItem item : dataProperties.getSteamItems())
         {
-            if (item.isAvailable())
+            if (item.getAvailable())
             {
                 item.setAvailable(false);
                 return item;
@@ -31,14 +46,43 @@ public class SteamItemsQueueManager implements ItemQueueManager<SteamItem>
     @Override
     public synchronized void addItem(SteamItem item)
     {
-        items.add(item);
+        dataProperties.getSteamItems().add(item);
     }
 
     @Override
     public synchronized void moveItemToLastAndUnblock(SteamItem item)
     {
         item.setAvailable(true);
-        items.remove(item);
-        items.addLast(item);
+        dataProperties.getSteamItems().remove(item);
+        dataProperties.getSteamItems().addLast(item);
+    }
+
+    public void updateItemsPricesAndLinks()
+    {
+        logger.info("Обновляем цены на предметы");
+        ConcurrentLinkedDeque<SteamItem> steamItems = dataProperties.getSteamItems();
+        for (SteamItem steamItem : steamItems)
+        {
+            String hashName = steamItem.getHashName();
+            double averagePrice = steamItemPriceFetcher.fetchItemAveragePrice(steamItemUrlGenerator.generatePriceOverviewApiUrl(hashName));
+            String listingsUrl = steamItemUrlGenerator.generateListingsUrl(hashName);
+
+            if (averagePrice > 0.0)
+            {
+                steamItem.setAveragePrice(averagePrice);
+            }
+            steamItem.setListingsUrl(listingsUrl);
+
+            System.out.println(steamItems);
+            if (!steamItem.isValid())
+            {
+                steamItems.remove(steamItem);
+                System.out.println(steamItems);
+            }
+            else
+            {
+                logger.warn("Ошибка при загрузке предмета {}. Парсинг этого предмета НЕ будет запущен", hashName);
+            }
+        }
     }
 }

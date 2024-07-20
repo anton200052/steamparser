@@ -1,8 +1,7 @@
 package me.vasylkov.steamparser.telegram.service;
 
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.general.interfaces.MessagesSender;
-import me.vasylkov.steamparser.parsing.entity.SteamSticker;
+import me.vasylkov.steamparser.common.abstraction.MessagesSender;
 import me.vasylkov.steamparser.parsing.entity.Sticker;
 import me.vasylkov.steamparser.telegram.configuration.TelegramProperties;
 import org.slf4j.Logger;

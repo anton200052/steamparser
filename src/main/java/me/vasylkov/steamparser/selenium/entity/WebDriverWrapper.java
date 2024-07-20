@@ -13,7 +13,7 @@ import java.util.List;
 public class WebDriverWrapper
 {
     private WebDriver driver;
-    private ProxyWrapper proxy;
+    private SeleniumProxyWrapper proxy;
     private WebDriverWait webDriverWait;
     private List<Path> tempFiles;
 }

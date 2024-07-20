@@ -1,6 +1,6 @@
-package me.vasylkov.steamparser.selenium.component;
+package me.vasylkov.steamparser.common.component;
 
-import me.vasylkov.steamparser.selenium.entity.ProxyType;
+import me.vasylkov.steamparser.common.enums.ProxyType;
 import org.springframework.stereotype.Component;
 
 import java.util.regex.Pattern;

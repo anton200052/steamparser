@@ -1,23 +1,22 @@
-package me.vasylkov.steamparser.parsing.component;
+package me.vasylkov.steamparser.selenium.component;
 
 import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
-import me.vasylkov.steamparser.parsing.entity.PageLoadResult;
-import me.vasylkov.steamparser.selenium.component.WebDriverProxyChanger;
+import me.vasylkov.steamparser.parsing.enums.PageLoadResult;
+import me.vasylkov.steamparser.selenium.configuration.SeleniumProperties;
 import me.vasylkov.steamparser.selenium.entity.WebDriverWrapper;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 @Component
 @RequiredArgsConstructor
-public class SteamPageLoader implements PageLoader
+public class SteamSeleniumPageLoader implements SeleniumPageLoader
 {
     private final Logger logger;
-    private final ParsingProperties properties;
+    private final SeleniumProperties seleniumProperties;
     private final WebDriverProxyChanger webDriverProxyChanger;
 
     @Override
@@ -81,7 +80,7 @@ public class SteamPageLoader implements PageLoader
     {
         try
         {
-            Thread.sleep(properties.getPageChangingDuration() * 1000L);
+            Thread.sleep(seleniumProperties.getPageChangingDuration() * 1000L);
             JavascriptExecutor javascriptExecutor = (JavascriptExecutor) webDriver;
             javascriptExecutor.executeScript("g_oSearchResults.GoToPage(" + (pageNum - 1) + ")");
         }

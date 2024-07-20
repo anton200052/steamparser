@@ -1,6 +1,6 @@
 package me.vasylkov.steamparser.telegram.component;
 
-import me.vasylkov.steamparser.general.interfaces.MessagesSender;
+import me.vasylkov.steamparser.common.abstraction.MessagesSender;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.objects.Update;
