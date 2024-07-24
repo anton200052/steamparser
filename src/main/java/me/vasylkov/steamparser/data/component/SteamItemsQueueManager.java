@@ -73,14 +73,9 @@ public class SteamItemsQueueManager implements ItemQueueManager<SteamItem>
             }
             steamItem.setListingsUrl(listingsUrl);
 
-            System.out.println(steamItems);
             if (!steamItem.isValid())
             {
                 steamItems.remove(steamItem);
-                System.out.println(steamItems);
-            }
-            else
-            {
                 logger.warn("Ошибка при загрузке предмета {}. Парсинг этого предмета НЕ будет запущен", hashName);
             }
         }

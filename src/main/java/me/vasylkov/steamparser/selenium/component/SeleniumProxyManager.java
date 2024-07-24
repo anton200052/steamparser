@@ -3,6 +3,7 @@ package me.vasylkov.steamparser.selenium.component;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.common.abstraction.ProxyManager;
+import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
 import me.vasylkov.steamparser.selenium.entity.SeleniumProxyWrapper;
 import me.vasylkov.steamparser.selenium.configuration.SeleniumProperties;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,7 @@ public class SeleniumProxyManager implements ProxyManager<SeleniumProxyWrapper>
 {
     private List<SeleniumProxyWrapper> proxyList;
     private final SeleniumProxyListConverter seleniumProxyListConverter;
-    private final SeleniumProperties seleniumProperties;
+    private final ParsingProperties parsingProperties;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     @Override
@@ -27,7 +28,7 @@ public class SeleniumProxyManager implements ProxyManager<SeleniumProxyWrapper>
         if (!seleniumProxyWrapper.isBlocked())
         {
             seleniumProxyWrapper.setBlocked(true);
-            scheduler.schedule(() -> unblockProxy(seleniumProxyWrapper), seleniumProperties.getProxiesBlockingTime(), TimeUnit.SECONDS);
+            scheduler.schedule(() -> unblockProxy(seleniumProxyWrapper), parsingProperties.getProxyBlockingTime(), TimeUnit.SECONDS);
         }
     }
 
@@ -56,9 +57,9 @@ public class SeleniumProxyManager implements ProxyManager<SeleniumProxyWrapper>
     @PostConstruct
     public void initProxyList()
     {
-        if (seleniumProperties.isProxiesEnabled())
+        if (parsingProperties.isEnableProxy())
         {
-            proxyList = seleniumProxyListConverter.convert(seleniumProperties.getProxyList());
+            proxyList = seleniumProxyListConverter.convert(parsingProperties.getProxyList());
         }
     }
 }

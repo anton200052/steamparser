@@ -5,6 +5,7 @@ import me.vasylkov.steamparser.data.entity.Item;
 import me.vasylkov.steamparser.data.entity.SteamItem;
 import me.vasylkov.steamparser.common.abstraction.MessagesSender;
 import me.vasylkov.steamparser.parsing.component.PageAnalyser;
+import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
 import me.vasylkov.steamparser.selenium.component.SeleniumPageDataParser;
 import me.vasylkov.steamparser.selenium.component.SteamSeleniumPageLoader;
 import me.vasylkov.steamparser.parsing.component.ParsingStatus;
@@ -33,11 +34,11 @@ public class SeleniumSteamParsingService implements ParsingService
     private final MessagesSender messagesSender;
     @Qualifier("parsingStatus")
     private final ParsingStatus parsingStatus;
-    private final SeleniumProperties seleniumProperties;
+    private final ParsingProperties parsingProperties;
     private final ItemQueueManager<SteamItem> itemQueueManager;
     private final ChromeDriverFactory chromeDriverFactory;
 
-    public SeleniumSteamParsingService(Logger logger, SeleniumPageDataParser seleniumPageDataParser, SteamSeleniumPageLoader steamPageLoader, PageAnalyser pageAnalyser, MessagesSender messagesSender, ParsingStatus parsingStatus, SeleniumProperties seleniumProperties, ItemQueueManager<SteamItem> itemQueueManager, ChromeDriverFactory chromeDriverFactory)
+    public SeleniumSteamParsingService(Logger logger, SeleniumPageDataParser seleniumPageDataParser, SteamSeleniumPageLoader steamPageLoader, PageAnalyser pageAnalyser, MessagesSender messagesSender, ParsingStatus parsingStatus, ParsingProperties parsingProperties, ItemQueueManager<SteamItem> itemQueueManager, ChromeDriverFactory chromeDriverFactory)
     {
         this.logger = logger;
         this.seleniumPageDataParser = seleniumPageDataParser;
@@ -45,7 +46,7 @@ public class SeleniumSteamParsingService implements ParsingService
         this.pageAnalyser = pageAnalyser;
         this.messagesSender = messagesSender;
         this.parsingStatus = parsingStatus;
-        this.seleniumProperties = seleniumProperties;
+        this.parsingProperties = parsingProperties;
         this.itemQueueManager = itemQueueManager;
         this.chromeDriverFactory = chromeDriverFactory;
     }
@@ -93,7 +94,7 @@ public class SeleniumSteamParsingService implements ParsingService
         {
             parseItem(currentAvailable, webDriverWrapper);
 
-            if (seleniumProperties.isCycleParsing())
+            if (parsingProperties.isCycle())
             {
                 itemQueueManager.moveItemToLastAndUnblock((SteamItem) currentAvailable);
             }
@@ -107,7 +108,7 @@ public class SeleniumSteamParsingService implements ParsingService
         Item currentAvailable = itemQueueManager.getAndBlockFirstAvailableItem();
         if (currentAvailable == null)
         {
-            if (lastAvailable == null || !seleniumProperties.isCycleParsing())
+            if (lastAvailable == null || !parsingProperties.isCycle())
             {
                 logger.info("Задач для потока {} нет, поток не будет продолжать работу", Thread.currentThread().getId());
                 return null;

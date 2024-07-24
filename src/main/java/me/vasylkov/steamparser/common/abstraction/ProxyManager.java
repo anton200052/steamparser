@@ -4,7 +4,7 @@ public interface ProxyManager<T extends ProxyWrapper<?>>
 {
     void blockProxy(T proxyWrapper);
 
-    void unblockProxy(T seleniumProxyWrapper);
+    void unblockProxy(T proxyWrapper);
 
     T getAvailableProxy();
 }

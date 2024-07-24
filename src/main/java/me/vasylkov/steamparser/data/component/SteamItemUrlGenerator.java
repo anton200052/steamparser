@@ -2,6 +2,7 @@ package me.vasylkov.steamparser.data.component;
 
 import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
+import me.vasylkov.steamparser.parsing.configuration.SteamProperties;
 import me.vasylkov.steamparser.selenium.configuration.SeleniumProperties;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class SteamItemUrlGenerator implements UrlGenerator
 {
-    private final SeleniumProperties parsingProperties;
+    private final SteamProperties steamProperties;
 
     public String generateListingsUrl(String itemName)
     {
@@ -21,7 +22,7 @@ public class SteamItemUrlGenerator implements UrlGenerator
 
     public String generatePriceOverviewApiUrl(String itemName) //192.168.0.107
     {
-        return "http://localhost:8080/api/items/single" + "?hashName=" + itemName + "&currencyCode=" + parsingProperties.getSteamCurrencyCode();
+        return "http://localhost:8080/api/items/single" + "?hashName=" + itemName + "&currencyCode=" + steamProperties.getCurrencyCode();
     }
 
     private String encodeItem(String itemName)

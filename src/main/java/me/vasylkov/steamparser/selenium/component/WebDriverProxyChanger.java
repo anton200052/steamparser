@@ -1,5 +1,6 @@
 package me.vasylkov.steamparser.selenium.component;
 
+import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
 import me.vasylkov.steamparser.selenium.configuration.SeleniumProperties;
 import me.vasylkov.steamparser.selenium.entity.SeleniumProxyWrapper;
 import me.vasylkov.steamparser.selenium.entity.WebDriverWrapper;
@@ -17,20 +18,20 @@ public class WebDriverProxyChanger
     @Qualifier("chromeDriverFactory")
     private final DriverFactory driverFactory;
     private final SeleniumProxyManager seleniumProxyManager;
-    private final SeleniumProperties properties;
+    private final ParsingProperties parsingProperties;
     private final SeleniumTempFilesCleaner seleniumTempFilesCleaner;
 
-    public WebDriverProxyChanger(DriverFactory driverFactory, SeleniumProxyManager seleniumProxyManager, SeleniumProperties properties, SeleniumTempFilesCleaner seleniumTempFilesCleaner)
+    public WebDriverProxyChanger(DriverFactory driverFactory, SeleniumProxyManager seleniumProxyManager, ParsingProperties parsingProperties, SeleniumTempFilesCleaner seleniumTempFilesCleaner)
     {
         this.driverFactory = driverFactory;
         this.seleniumProxyManager = seleniumProxyManager;
-        this.properties = properties;
+        this.parsingProperties = parsingProperties;
         this.seleniumTempFilesCleaner = seleniumTempFilesCleaner;
     }
 
     public void changeProxyAndWebDriver(WebDriverWrapper webDriverWrapper)
     {
-        if (properties.isProxiesEnabled())
+        if (parsingProperties.isEnableProxy())
         {
             WebDriver driver = webDriverWrapper.getDriver();
             SeleniumProxyWrapper proxy = webDriverWrapper.getProxy();

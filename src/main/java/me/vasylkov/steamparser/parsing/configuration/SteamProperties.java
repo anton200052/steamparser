@@ -5,17 +5,10 @@ import me.vasylkov.steamparser.parsing.enums.ParsingType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "parsing")
-public class ParsingProperties
+@ConfigurationProperties(prefix = "steam")
+public class SteamProperties
 {
-    private ParsingType type;
-    private boolean cycle;
-    private int threads;
-    private boolean enableProxy;
-    private int proxyBlockingTime;
-    private List<String> proxyList;
+    private String currencyCode;
 }
