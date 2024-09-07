@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.price_api.configuration.PriceApiProperties;
+import me.vasylkov.steamparser.rest_template.component.RestTemplateFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -14,14 +15,23 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @Component
-@RequiredArgsConstructor
 public class SteamItemPriceFetcher implements ItemPriceFetcher
 {
 
     private final Logger logger;
-    private final RestTemplate restTemplate;
     private final PriceApiProperties properties;
     private final ObjectMapper objectMapper;
+    private final RestTemplateFactory restTemplateFactory;
+    private final RestTemplate restTemplate;
+
+    public SteamItemPriceFetcher(Logger logger, PriceApiProperties properties, ObjectMapper objectMapper, RestTemplateFactory restTemplateFactory)
+    {
+        this.logger = logger;
+        this.properties = properties;
+        this.objectMapper = objectMapper;
+        this.restTemplateFactory = restTemplateFactory;
+        this.restTemplate = restTemplateFactory.createDefaultRestTemplate();
+    }
 
     @Override
     public double fetchItemAveragePrice(String priceApiUrl)
