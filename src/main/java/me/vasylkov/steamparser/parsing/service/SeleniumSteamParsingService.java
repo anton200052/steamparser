@@ -1,6 +1,7 @@
 package me.vasylkov.steamparser.parsing.service;
 
 import me.vasylkov.steamparser.data.component.ItemQueueManager;
+import me.vasylkov.steamparser.data.component.UrlGenerator;
 import me.vasylkov.steamparser.data.entity.Item;
 import me.vasylkov.steamparser.data.entity.SteamItem;
 import me.vasylkov.steamparser.common.abstraction.MessagesSender;
@@ -13,7 +14,6 @@ import me.vasylkov.steamparser.parsing.entity.AnalysingResult;
 import me.vasylkov.steamparser.parsing.entity.Listing;
 import me.vasylkov.steamparser.parsing.entity.SteamPage;
 import me.vasylkov.steamparser.selenium.component.ChromeDriverFactory;
-import me.vasylkov.steamparser.selenium.configuration.SeleniumProperties;
 import me.vasylkov.steamparser.selenium.entity.WebDriverWrapper;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -37,8 +37,9 @@ public class SeleniumSteamParsingService implements ParsingService
     private final ParsingProperties parsingProperties;
     private final ItemQueueManager<SteamItem> itemQueueManager;
     private final ChromeDriverFactory chromeDriverFactory;
+    private final UrlGenerator urlGenerator;
 
-    public SeleniumSteamParsingService(Logger logger, SeleniumPageDataParser seleniumPageDataParser, SteamSeleniumPageLoader steamPageLoader, PageAnalyser pageAnalyser, MessagesSender messagesSender, ParsingStatus parsingStatus, ParsingProperties parsingProperties, ItemQueueManager<SteamItem> itemQueueManager, ChromeDriverFactory chromeDriverFactory)
+    public SeleniumSteamParsingService(Logger logger, SeleniumPageDataParser seleniumPageDataParser, SteamSeleniumPageLoader steamPageLoader, PageAnalyser pageAnalyser, MessagesSender messagesSender, ParsingStatus parsingStatus, ParsingProperties parsingProperties, ItemQueueManager<SteamItem> itemQueueManager, ChromeDriverFactory chromeDriverFactory, UrlGenerator urlGenerator)
     {
         this.logger = logger;
         this.seleniumPageDataParser = seleniumPageDataParser;
@@ -49,6 +50,7 @@ public class SeleniumSteamParsingService implements ParsingService
         this.parsingProperties = parsingProperties;
         this.itemQueueManager = itemQueueManager;
         this.chromeDriverFactory = chromeDriverFactory;
+        this.urlGenerator = urlGenerator;
     }
 
     @Async
@@ -121,6 +123,7 @@ public class SeleniumSteamParsingService implements ParsingService
     private void parseItem(Item item, WebDriverWrapper webDriverWrapper)
     {
         SteamItem steamItem = (SteamItem) item;
+        String listingsUrl = urlGenerator.generateListingsUrl(item.getHashName());
         logger.info("Начинаем парсинг предмета {}", steamItem.getHashName());
         int currentPageNum = 1;
 
@@ -131,7 +134,7 @@ public class SeleniumSteamParsingService implements ParsingService
                 return;
             }
 
-            steamPageLoader.loadPageByPageNum(webDriverWrapper, steamItem.getListingsUrl(), currentPageNum);
+            steamPageLoader.loadPageByPageNum(webDriverWrapper, listingsUrl, currentPageNum);
             SteamPage steamPage = (SteamPage) seleniumPageDataParser.parsePageDataToObject(webDriverWrapper.getDriver());
             AnalysingResult steamAnalysingResult = pageAnalyser.analysePage(steamPage, steamItem);
 

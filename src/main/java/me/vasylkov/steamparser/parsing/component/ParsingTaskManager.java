@@ -6,7 +6,6 @@ import me.vasylkov.steamparser.data.entity.SteamItem;
 import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
 import me.vasylkov.steamparser.parsing.service.ParsingService;
 import me.vasylkov.steamparser.parsing.service.SeleniumSteamParsingService;
-import me.vasylkov.steamparser.selenium.configuration.SeleniumProperties;
 import me.vasylkov.steamparser.telegram.service.TelegramMessagesSender;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -43,7 +42,7 @@ public class ParsingTaskManager
             return;
         }
 
-        steamItemQueueManager.updateItemsPricesAndLinks();
+        steamItemQueueManager.updateItemsPrices();
         statusManager.setParsingStarted(true);
         messagesSender.sendMessage("Начинаем парсинг. Доп. информация доступна в консоли приложения");
         int threads = parsingProperties.getThreads();

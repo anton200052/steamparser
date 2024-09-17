@@ -57,7 +57,7 @@ public class SteamItemsQueueManager implements ItemQueueManager<SteamItem>
         dataProperties.getSteamItems().addLast(item);
     }
 
-    public void updateItemsPricesAndLinks()
+    public void updateItemsPrices()
     {
         logger.info("Обновляем цены на предметы");
         ConcurrentLinkedDeque<SteamItem> steamItems = dataProperties.getSteamItems();
@@ -65,13 +65,11 @@ public class SteamItemsQueueManager implements ItemQueueManager<SteamItem>
         {
             String hashName = steamItem.getHashName();
             double averagePrice = steamItemPriceFetcher.fetchItemAveragePrice(steamItemUrlGenerator.generatePriceOverviewApiUrl(hashName));
-            String listingsUrl = steamItemUrlGenerator.generateListingsUrl(hashName);
 
             if (averagePrice > 0.0)
             {
                 steamItem.setAveragePrice(averagePrice);
             }
-            steamItem.setListingsUrl(listingsUrl);
 
             if (!steamItem.isValid())
             {

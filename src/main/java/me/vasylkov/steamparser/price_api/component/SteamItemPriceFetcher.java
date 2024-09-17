@@ -21,7 +21,6 @@ public class SteamItemPriceFetcher implements ItemPriceFetcher
     private final Logger logger;
     private final PriceApiProperties properties;
     private final ObjectMapper objectMapper;
-    private final RestTemplateFactory restTemplateFactory;
     private final RestTemplate restTemplate;
 
     public SteamItemPriceFetcher(Logger logger, PriceApiProperties properties, ObjectMapper objectMapper, RestTemplateFactory restTemplateFactory)
@@ -29,7 +28,6 @@ public class SteamItemPriceFetcher implements ItemPriceFetcher
         this.logger = logger;
         this.properties = properties;
         this.objectMapper = objectMapper;
-        this.restTemplateFactory = restTemplateFactory;
         this.restTemplate = restTemplateFactory.createDefaultRestTemplate();
     }
 

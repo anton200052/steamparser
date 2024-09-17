@@ -10,5 +10,5 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "steam")
 public class SteamProperties
 {
-    private String currencyCode;
+    private CurrencyCode currencyCode;
 }

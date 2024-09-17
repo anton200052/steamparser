@@ -3,6 +3,7 @@ package me.vasylkov.steamparser.data.component;
 import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
 import me.vasylkov.steamparser.parsing.configuration.SteamProperties;
+import me.vasylkov.steamparser.price_api.configuration.PriceApiProperties;
 import me.vasylkov.steamparser.selenium.configuration.SeleniumProperties;
 import org.springframework.stereotype.Component;
 
@@ -14,15 +15,21 @@ import java.nio.charset.StandardCharsets;
 public class SteamItemUrlGenerator implements UrlGenerator
 {
     private final SteamProperties steamProperties;
+    private final PriceApiProperties priceApiProperties;
 
     public String generateListingsUrl(String itemName)
     {
-        return "https://steamcommunity.com/market/listings/730/" + encodeItem(itemName) + "?l=english";
+        return String.format("https://steamcommunity.com/market/listings/730/%s?l=english", encodeItem(itemName));
+    }
+
+    public String generateRenderUrl(String itemName, int start, int count)
+    {
+        return String.format("https://steamcommunity.com/market/listings/730/%s/render/?query=&start=%d&count=%d&currency=%d", encodeItem(itemName), start, count, steamProperties.getCurrencyCode().getCode());
     }
 
     public String generatePriceOverviewApiUrl(String itemName) //192.168.0.107
     {
-        return "http://localhost:8080/api/items/single" + "?hashName=" + itemName + "&currencyCode=" + steamProperties.getCurrencyCode();
+        return String.format(priceApiProperties.getUrl() + "?hashName=%s&currencyCode=%s", encodeItem(itemName), steamProperties.getCurrencyCode());
     }
 
     private String encodeItem(String itemName)

@@ -7,5 +7,5 @@ public interface ItemQueueManager<T extends Item>
     T getAndBlockFirstAvailableItem();
     void addItem(T item);
     void moveItemToLastAndUnblock(T item);
-    void updateItemsPricesAndLinks();
+    void updateItemsPrices();
 }

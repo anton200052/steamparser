@@ -10,4 +10,5 @@ import org.springframework.context.annotation.Configuration;
 public class PriceApiProperties
 {
     private int itemPriceFetcherDuration;
+    private String url;
 }

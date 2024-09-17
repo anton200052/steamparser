@@ -8,9 +8,6 @@ public interface Item extends Validable
     Double getAveragePrice();
     void setAveragePrice(Double averagePrice);
 
-    String getListingsUrl();
-    void setListingsUrl(String listingsUrl);
-
     Integer getMaximalPage();
     void setMaximalPage(Integer maximalPage);
 
