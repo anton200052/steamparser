@@ -1,13 +1,20 @@
 package me.vasylkov.steamparser.parsing.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 @Data
-@AllArgsConstructor
-public class SteamAnalysingResult implements AnalysingResult
+@EqualsAndHashCode(callSuper = true)
+public class SteamAnalysingResult extends AnalysingResult
 {
-    private List<Listing> profitableListings;
+    public SteamAnalysingResult(List<ListingWithStickersMarkup> profitableListings)
+    {
+        super(profitableListings);
+    }
+
+    public SteamAnalysingResult()
+    {
+    }
 }

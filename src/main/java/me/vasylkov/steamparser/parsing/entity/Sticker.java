@@ -1,10 +1,15 @@
 package me.vasylkov.steamparser.parsing.entity;
 
-public interface Sticker
-{
-    String getHashName();
-    void setHashName(String hashName);
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-    double getPrice();
-    void setPrice(double price);
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public abstract class Sticker
+{
+    private String hashName;
+    private double price;
 }

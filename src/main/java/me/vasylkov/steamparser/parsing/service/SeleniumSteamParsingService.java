@@ -7,6 +7,7 @@ import me.vasylkov.steamparser.data.entity.SteamItem;
 import me.vasylkov.steamparser.common.abstraction.MessagesSender;
 import me.vasylkov.steamparser.parsing.component.PageAnalyser;
 import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
+import me.vasylkov.steamparser.parsing.entity.ListingWithStickersMarkup;
 import me.vasylkov.steamparser.selenium.component.SeleniumPageDataParser;
 import me.vasylkov.steamparser.selenium.component.SteamSeleniumPageLoader;
 import me.vasylkov.steamparser.parsing.component.ParsingStatus;
@@ -35,11 +36,11 @@ public class SeleniumSteamParsingService implements ParsingService
     @Qualifier("parsingStatus")
     private final ParsingStatus parsingStatus;
     private final ParsingProperties parsingProperties;
-    private final ItemQueueManager<SteamItem> itemQueueManager;
+    private final ItemQueueManager itemQueueManager;
     private final ChromeDriverFactory chromeDriverFactory;
     private final UrlGenerator urlGenerator;
 
-    public SeleniumSteamParsingService(Logger logger, SeleniumPageDataParser seleniumPageDataParser, SteamSeleniumPageLoader steamPageLoader, PageAnalyser pageAnalyser, MessagesSender messagesSender, ParsingStatus parsingStatus, ParsingProperties parsingProperties, ItemQueueManager<SteamItem> itemQueueManager, ChromeDriverFactory chromeDriverFactory, UrlGenerator urlGenerator)
+    public SeleniumSteamParsingService(Logger logger, SeleniumPageDataParser seleniumPageDataParser, SteamSeleniumPageLoader steamPageLoader, PageAnalyser pageAnalyser, MessagesSender messagesSender, ParsingStatus parsingStatus, ParsingProperties parsingProperties, ItemQueueManager itemQueueManager, ChromeDriverFactory chromeDriverFactory, UrlGenerator urlGenerator)
     {
         this.logger = logger;
         this.seleniumPageDataParser = seleniumPageDataParser;
@@ -55,7 +56,7 @@ public class SeleniumSteamParsingService implements ParsingService
 
     @Async
     @Override
-    public void executeParsingTask()
+    public void executeAsyncParsingTask()
     {
         parseItems();
     }
@@ -91,33 +92,18 @@ public class SeleniumSteamParsingService implements ParsingService
 
     private Item processNextAvailableItem(WebDriverWrapper webDriverWrapper, Item lastAvailable)
     {
-        Item currentAvailable = getCurrentAvailable(lastAvailable);
-        if (currentAvailable != null)
+        Item available = itemQueueManager.getAvailableOrLastItem(lastAvailable, parsingProperties.isCycle());
+        if (available != null)
         {
-            parseItem(currentAvailable, webDriverWrapper);
+            parseItem(available, webDriverWrapper);
 
             if (parsingProperties.isCycle())
             {
-                itemQueueManager.moveItemToLastAndUnblock((SteamItem) currentAvailable);
+                itemQueueManager.moveItemToLastAndUnblock(available);
             }
         }
 
-        return currentAvailable;
-    }
-
-    private Item getCurrentAvailable(Item lastAvailable)
-    {
-        Item currentAvailable = itemQueueManager.getAndBlockFirstAvailableItem();
-        if (currentAvailable == null)
-        {
-            if (lastAvailable == null || !parsingProperties.isCycle())
-            {
-                logger.info("Задач для потока {} нет, поток не будет продолжать работу", Thread.currentThread().getId());
-                return null;
-            }
-            currentAvailable = lastAvailable;
-        }
-        return currentAvailable;
+        return available;
     }
 
     private void parseItem(Item item, WebDriverWrapper webDriverWrapper)
@@ -138,7 +124,7 @@ public class SeleniumSteamParsingService implements ParsingService
             SteamPage steamPage = (SteamPage) seleniumPageDataParser.parsePageDataToObject(webDriverWrapper.getDriver());
             AnalysingResult steamAnalysingResult = pageAnalyser.analysePage(steamPage, steamItem);
 
-            for (Listing listing : steamAnalysingResult.getProfitableListings())
+            for (ListingWithStickersMarkup listing : steamAnalysingResult.getProfitableListings())
             {
                 messagesSender.sendProfitableItemData(listing.getImgUrl(), listing.getHashName(), item.getAveragePrice(), listing.getPrice(), currentPageNum, listing.getStickers(), listing.getTotalStickersPrice(), listing.getPriceWithStickersMarkup(), listing.getStickersMarkupPercentage());
             }

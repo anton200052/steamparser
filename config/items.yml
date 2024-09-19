@@ -4,4 +4,4 @@ data:
       maximalPage: 100
       stickersModule:
         enabled: true
-        minimalStickersPrice: 50.0
+        minimalStickersPrice: 10.0

@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.parsing.entity;
+package me.vasylkov.steamparser.csfloat.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

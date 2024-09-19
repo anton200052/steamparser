@@ -2,7 +2,6 @@ package me.vasylkov.steamparser.parsing.component;
 
 import me.vasylkov.steamparser.common.abstraction.MessagesSender;
 import me.vasylkov.steamparser.data.component.ItemQueueManager;
-import me.vasylkov.steamparser.data.entity.SteamItem;
 import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
 import me.vasylkov.steamparser.parsing.service.ParsingService;
 import me.vasylkov.steamparser.parsing.service.SeleniumSteamParsingService;
@@ -16,18 +15,18 @@ public class ParsingTaskManager
 {
     @Qualifier("parsingStatus")
     private final ParsingStatus statusManager;
-    @Qualifier("seleniumSteamParsingService")
-    private final ParsingService steamParsingService;
+    @Qualifier("steamRenderParsingService")
+    private final ParsingService steamRenderParsingService;
     @Qualifier("telegramMessagesSender")
     private final MessagesSender messagesSender;
     private final Logger logger;
     private final ParsingProperties parsingProperties;
-    private final ItemQueueManager<SteamItem> steamItemQueueManager;
+    private final ItemQueueManager steamItemQueueManager;
 
-    public ParsingTaskManager(ParsingStatus statusManager, SeleniumSteamParsingService seleniumSteamParsingService, TelegramMessagesSender messagesSender, Logger logger, ParsingProperties parsingProperties, ItemQueueManager<SteamItem> steamItemQueueManager)
+    public ParsingTaskManager(ParsingStatus statusManager, ParsingService steamRenderParsingService, TelegramMessagesSender messagesSender, Logger logger, ParsingProperties parsingProperties, ItemQueueManager steamItemQueueManager)
     {
         this.statusManager = statusManager;
-        this.steamParsingService = seleniumSteamParsingService;
+        this.steamRenderParsingService = steamRenderParsingService;
         this.messagesSender = messagesSender;
         this.logger = logger;
         this.parsingProperties = parsingProperties;
@@ -42,7 +41,7 @@ public class ParsingTaskManager
             return;
         }
 
-        steamItemQueueManager.updateItemsPrices();
+        steamItemQueueManager.updatePricesInQueue();
         statusManager.setParsingStarted(true);
         messagesSender.sendMessage("Начинаем парсинг. Доп. информация доступна в консоли приложения");
         int threads = parsingProperties.getThreads();
@@ -50,7 +49,7 @@ public class ParsingTaskManager
 
         for (int i = 0; i < threads; i++)
         {
-            steamParsingService.executeParsingTask();
+            steamRenderParsingService.executeAsyncParsingTask();
         }
     }
 

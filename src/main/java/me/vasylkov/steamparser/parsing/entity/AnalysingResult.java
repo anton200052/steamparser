@@ -1,9 +1,15 @@
 package me.vasylkov.steamparser.parsing.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
-public interface AnalysingResult
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public abstract class AnalysingResult
 {
-    List<Listing> getProfitableListings();
-    void setProfitableListings(List<Listing> listings);
+    private List<ListingWithStickersMarkup> profitableListings;
 }

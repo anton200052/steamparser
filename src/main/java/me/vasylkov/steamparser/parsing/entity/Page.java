@@ -1,8 +1,15 @@
 package me.vasylkov.steamparser.parsing.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
-public interface Page
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public abstract class Page
 {
-    List<Listing> getListings();
+    private List<Listing> listings;
 }

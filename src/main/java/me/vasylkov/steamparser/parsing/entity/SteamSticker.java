@@ -2,11 +2,18 @@ package me.vasylkov.steamparser.parsing.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-@AllArgsConstructor
-public class SteamSticker implements Sticker
+@EqualsAndHashCode(callSuper = true)
+public class SteamSticker extends Sticker
 {
-    private String hashName;
-    private double price;
+    public SteamSticker(String hashName, double price)
+    {
+        super(hashName, price);
+    }
+
+    public SteamSticker()
+    {
+    }
 }

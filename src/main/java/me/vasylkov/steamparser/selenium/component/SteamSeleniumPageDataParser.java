@@ -40,7 +40,7 @@ public class SteamSeleniumPageDataParser implements SeleniumPageDataParser
     @Override
     public Page parsePageDataToObject(WebDriver webDriver)
     {
-        return new SteamPage(parsePageNumber(webDriver, PageNumType.CURRENT), parsePageNumber(webDriver, PageNumType.MAX), parseListings(webDriver));
+        return new SteamPage(parseListings(webDriver), parsePageNumber(webDriver, PageNumType.CURRENT), parsePageNumber(webDriver, PageNumType.MAX));
     }
 
     private int parsePageNumber(WebDriver webDriver, PageNumType pageNumType)
@@ -91,17 +91,15 @@ public class SteamSeleniumPageDataParser implements SeleniumPageDataParser
                 double listingPrice = Double.parseDouble(listingElement.findElement(By.cssSelector(".price_with")).getText().replaceAll("[^\\d,\\.]", "").replaceAll(",", "."));
                 List<Sticker> listingSteamStickers = new ArrayList<>();
                 List<WebElement> stickersElements = listingElement.findElement(By.cssSelector("ul")).findElements(By.cssSelector("li"));
-                double totalStickerPrice = 0.0;
 
                 for (WebElement stickerElement : stickersElements)
                 {
                     String stickerHashName = stickerElement.findElement(By.cssSelector(".sticker-image > img")).getAttribute("title");
                     double stickerPrice = itemPriceFetcher.fetchItemAveragePrice(steamItemUrlGenerator.generatePriceOverviewApiUrl(stickerHashName));
-                    totalStickerPrice += stickerPrice;
                     listingSteamStickers.add(new SteamSticker(stickerHashName, stickerPrice));
                 }
 
-                listings.add(new SteamListing(listingHashName, listingPrice, listingSteamStickers, imgUrl, totalStickerPrice, null, null));
+                listings.add(new SteamListing(listingHashName, listingPrice, listingSteamStickers, imgUrl));
             }
         }
         catch (NoSuchElementException | StaleElementReferenceException e)

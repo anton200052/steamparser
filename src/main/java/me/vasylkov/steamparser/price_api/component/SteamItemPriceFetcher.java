@@ -2,9 +2,7 @@ package me.vasylkov.steamparser.price_api.component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.price_api.configuration.PriceApiProperties;
-import me.vasylkov.steamparser.rest_template.component.RestTemplateFactory;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -23,12 +21,12 @@ public class SteamItemPriceFetcher implements ItemPriceFetcher
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
 
-    public SteamItemPriceFetcher(Logger logger, PriceApiProperties properties, ObjectMapper objectMapper, RestTemplateFactory restTemplateFactory)
+    public SteamItemPriceFetcher(Logger logger, PriceApiProperties properties, ObjectMapper objectMapper, RestTemplate restTemplate)
     {
         this.logger = logger;
         this.properties = properties;
         this.objectMapper = objectMapper;
-        this.restTemplate = restTemplateFactory.createDefaultRestTemplate();
+        this.restTemplate = restTemplate;
     }
 
     @Override

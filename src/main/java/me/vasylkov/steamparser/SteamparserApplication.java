@@ -12,7 +12,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class SteamparserApplication
 {
-
     public static void main(String[] args)
     {
         SpringApplication.run(SteamparserApplication.class, args);

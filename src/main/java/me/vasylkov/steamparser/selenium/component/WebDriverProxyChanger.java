@@ -1,7 +1,6 @@
 package me.vasylkov.steamparser.selenium.component;
 
 import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
-import me.vasylkov.steamparser.selenium.configuration.SeleniumProperties;
 import me.vasylkov.steamparser.selenium.entity.SeleniumProxyWrapper;
 import me.vasylkov.steamparser.selenium.entity.WebDriverWrapper;
 import org.openqa.selenium.WebDriver;

@@ -1,12 +1,10 @@
-package me.vasylkov.steamparser.rest_template.component;
+package me.vasylkov.steamparser.apache_client.component;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import me.vasylkov.steamparser.apache_client.entity.ApacheClientProxyWrapper;
 import me.vasylkov.steamparser.common.abstraction.ProxyManager;
 import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
-import me.vasylkov.steamparser.rest_template.entity.RestTemplateProxyWrapper;
-import me.vasylkov.steamparser.selenium.component.SeleniumProxyListConverter;
-import me.vasylkov.steamparser.selenium.entity.SeleniumProxyWrapper;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,15 +14,15 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
-public class RestTemplateProxyManager implements ProxyManager<RestTemplateProxyWrapper>
+public class ApacheClientProxyManager implements ProxyManager<ApacheClientProxyWrapper>
 {
-    private List<RestTemplateProxyWrapper> proxyList;
-    private final RestTemplateProxyListConverter restTemplateProxyListConverter;
+    private List<ApacheClientProxyWrapper> proxyList;
+    private final ApacheClientProxyListConverter apacheClientProxyListConverter;
     private final ParsingProperties parsingProperties;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     @Override
-    public void blockProxy(RestTemplateProxyWrapper proxyWrapper)
+    public synchronized void blockProxy(ApacheClientProxyWrapper proxyWrapper)
     {
         if (!proxyWrapper.isBlocked())
         {
@@ -34,7 +32,7 @@ public class RestTemplateProxyManager implements ProxyManager<RestTemplateProxyW
     }
 
     @Override
-    public void unblockProxy(RestTemplateProxyWrapper proxyWrapper)
+    public synchronized void unblockProxy(ApacheClientProxyWrapper proxyWrapper)
     {
         if (proxyWrapper.isBlocked())
         {
@@ -43,9 +41,9 @@ public class RestTemplateProxyManager implements ProxyManager<RestTemplateProxyW
     }
 
     @Override
-    public RestTemplateProxyWrapper getAvailableProxy()
+    public synchronized ApacheClientProxyWrapper getAvailableProxy()
     {
-        for (RestTemplateProxyWrapper proxyWrapper : proxyList)
+        for (ApacheClientProxyWrapper proxyWrapper : proxyList)
         {
             if (!proxyWrapper.isBlocked())
             {
@@ -60,7 +58,7 @@ public class RestTemplateProxyManager implements ProxyManager<RestTemplateProxyW
     {
         if (parsingProperties.isEnableProxy())
         {
-            proxyList = restTemplateProxyListConverter.convert(parsingProperties.getProxyList());
+            proxyList = apacheClientProxyListConverter.convert(parsingProperties.getProxyList());
         }
     }
 }

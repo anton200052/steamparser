@@ -1,15 +1,27 @@
 package me.vasylkov.steamparser.parsing.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 @Data
-@AllArgsConstructor
-public class SteamPage implements Page
+@EqualsAndHashCode(callSuper = true)
+public class SteamPage extends Page
 {
     private int currentPage;
     private int maxPage;
-    private List<Listing> listings;
+
+    public SteamPage(List<Listing> listings, int currentPage, int maxPage)
+    {
+        super(listings);
+        this.currentPage = currentPage;
+        this.maxPage = maxPage;
+    }
+
+    public SteamPage(int currentPage, int maxPage)
+    {
+        this.currentPage = currentPage;
+        this.maxPage = maxPage;
+    }
 }

@@ -1,8 +1,8 @@
 package me.vasylkov.steamparser.data.component;
 
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.data.configuration.DataProperties;
+import me.vasylkov.steamparser.data.entity.Item;
 import me.vasylkov.steamparser.data.entity.SteamItem;
 import me.vasylkov.steamparser.price_api.component.ItemPriceFetcher;
 import org.slf4j.Logger;
@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Component
 @Data
-public class SteamItemsQueueManager implements ItemQueueManager<SteamItem>
+public class SteamItemsQueueManager implements ItemQueueManager
 {
     private final SteamItemUrlGenerator steamItemUrlGenerator;
     private final DataProperties dataProperties;
@@ -29,8 +29,7 @@ public class SteamItemsQueueManager implements ItemQueueManager<SteamItem>
         this.steamItemPriceFetcher = steamItemPriceFetcher;
     }
 
-    @Override
-    public synchronized SteamItem getAndBlockFirstAvailableItem()
+    private synchronized SteamItem getAndBlockFirstAvailableItem()
     {
         for (SteamItem item : dataProperties.getSteamItems())
         {
@@ -44,20 +43,36 @@ public class SteamItemsQueueManager implements ItemQueueManager<SteamItem>
     }
 
     @Override
-    public synchronized void addItem(SteamItem item)
+    public synchronized Item getAvailableOrLastItem(Item lastAvailable, boolean isParsingCycled)
     {
-        dataProperties.getSteamItems().add(item);
+        Item currentAvailable = getAndBlockFirstAvailableItem();
+        if (currentAvailable == null)
+        {
+            if (lastAvailable == null || !isParsingCycled)
+            {
+                logger.info("Предметов для потока {} нет, поток не будет продолжать работу", Thread.currentThread().getId());
+                return null;
+            }
+            currentAvailable = lastAvailable;
+        }
+        return currentAvailable;
     }
 
     @Override
-    public synchronized void moveItemToLastAndUnblock(SteamItem item)
+    public synchronized void addItem(Item item)
     {
-        item.setAvailable(true);
-        dataProperties.getSteamItems().remove(item);
-        dataProperties.getSteamItems().addLast(item);
+        dataProperties.getSteamItems().add((SteamItem) item);
     }
 
-    public void updateItemsPrices()
+    @Override
+    public synchronized void moveItemToLastAndUnblock(Item item)
+    {
+        item.setAvailable(true);
+        dataProperties.getSteamItems().remove((SteamItem) item);
+        dataProperties.getSteamItems().addLast((SteamItem) item);
+    }
+
+    public void updatePricesInQueue()
     {
         logger.info("Обновляем цены на предметы");
         ConcurrentLinkedDeque<SteamItem> steamItems = dataProperties.getSteamItems();

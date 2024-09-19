@@ -1,8 +1,7 @@
 package me.vasylkov.steamparser.selenium.component;
 
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
-import me.vasylkov.steamparser.parsing.enums.PageLoadResult;
+import me.vasylkov.steamparser.parsing.enums.PageChangingResult;
 import me.vasylkov.steamparser.selenium.configuration.SeleniumProperties;
 import me.vasylkov.steamparser.selenium.entity.WebDriverWrapper;
 import org.openqa.selenium.*;
@@ -22,20 +21,20 @@ public class SteamSeleniumPageLoader implements SeleniumPageLoader
     @Override
     public void loadPageByPageNum(WebDriverWrapper webDriverWrapper, String pageUrl, int pageNum)
     {
-        PageLoadResult pageLoadResult;
+        PageChangingResult pageChangingResult;
         do
         {
             loadListings(webDriverWrapper, pageUrl);
-            pageLoadResult = changePage(webDriverWrapper, pageNum);
+            pageChangingResult = changeAndLoadPage(webDriverWrapper, pageNum);
 
-            if (pageLoadResult == PageLoadResult.TOO_MANY_REQUESTS || !isExtensionLoaded(webDriverWrapper.getWebDriverWait()))
+            if (pageChangingResult == PageChangingResult.TOO_MANY_REQUESTS || !isExtensionLoaded(webDriverWrapper.getWebDriverWait()))
             {
                 webDriverProxyChanger.changeProxyAndWebDriver(webDriverWrapper);
             }
-        } while (pageLoadResult != PageLoadResult.SUCCESS);
+        } while (pageChangingResult != PageChangingResult.SUCCESS);
     }
 
-    private PageLoadResult changePage(WebDriverWrapper webDriverWrapper, int pageNum)
+    private PageChangingResult changeAndLoadPage(WebDriverWrapper webDriverWrapper, int pageNum)
     {
         executePageChangerScript(webDriverWrapper.getDriver(), pageNum);
         return getPageChangingResult(webDriverWrapper.getWebDriverWait(), pageNum);
@@ -94,7 +93,7 @@ public class SteamSeleniumPageLoader implements SeleniumPageLoader
         }
     }
 
-    private PageLoadResult getPageChangingResult(WebDriverWait webDriverWait, int pageNum)
+    private PageChangingResult getPageChangingResult(WebDriverWait webDriverWait, int pageNum)
     {
         try
         {
@@ -102,11 +101,11 @@ public class SteamSeleniumPageLoader implements SeleniumPageLoader
             String warningText = warningElement.getText();
             if (warningText.contains("Steam error: 429 Too Many Requests"))
             {
-                return PageLoadResult.TOO_MANY_REQUESTS;
+                return PageChangingResult.TOO_MANY_REQUESTS;
             }
             else
             {
-                return PageLoadResult.STEAM_ERROR;
+                return PageChangingResult.STEAM_ERROR;
             }
         }
         catch (TimeoutException e)
@@ -115,16 +114,16 @@ public class SteamSeleniumPageLoader implements SeleniumPageLoader
             {
                 logger.info("Страница: {}", pageNum);
                 webDriverWait.until(driver -> driver.findElement(By.className("info")).getText().startsWith(pageNum + " from"));
-                return PageLoadResult.SUCCESS;
+                return PageChangingResult.SUCCESS;
             }
             catch (TimeoutException | StaleElementReferenceException ex)
             {
-                return PageLoadResult.UNKNOWN_ERROR;
+                return PageChangingResult.UNKNOWN_ERROR;
             }
         }
         catch (StaleElementReferenceException e)
         {
-            return PageLoadResult.UNKNOWN_ERROR;
+            return PageChangingResult.UNKNOWN_ERROR;
         }
     }
 }

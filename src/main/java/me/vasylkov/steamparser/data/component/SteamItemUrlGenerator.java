@@ -17,20 +17,31 @@ public class SteamItemUrlGenerator implements UrlGenerator
     private final SteamProperties steamProperties;
     private final PriceApiProperties priceApiProperties;
 
+    @Override
     public String generateListingsUrl(String itemName)
     {
         return String.format("https://steamcommunity.com/market/listings/730/%s?l=english", encodeItem(itemName));
     }
 
+    @Override
     public String generateRenderUrl(String itemName, int start, int count)
     {
         return String.format("https://steamcommunity.com/market/listings/730/%s/render/?query=&start=%d&count=%d&currency=%d", encodeItem(itemName), start, count, steamProperties.getCurrencyCode().getCode());
     }
 
+    @Override
+    public String generateCSFloatUrl(String url)
+    {
+        return String.format("https://api.csfloat.com/?url=%s", url);
+    }
+
+    @Override
     public String generatePriceOverviewApiUrl(String itemName) //192.168.0.107
     {
-        return String.format(priceApiProperties.getUrl() + "?hashName=%s&currencyCode=%s", encodeItem(itemName), steamProperties.getCurrencyCode());
+        return String.format(priceApiProperties.getUrl() + "?hashName=%s&currencyCode=%s", itemName, steamProperties.getCurrencyCode());
     }
+
+
 
     private String encodeItem(String itemName)
     {
