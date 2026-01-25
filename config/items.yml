@@ -1,7 +1,19 @@
 data:
-  steam_items:
-    - hashName: "Desert Eagle | Blue Ply (Minimal Wear)"
-      maximalPage: 100
+  items:
+    - hashName: "AK-47 | Safari Mesh (Field-Tested)"
+      maximalPage: 1000
       stickersModule:
         enabled: true
-        minimalStickersPrice: 10.0
+        minimalStickersPrice: 500.0
+      floatModule:
+        enabled: true
+        minFloat:
+        maxFloat:
+      patternModule:
+        enabled: true
+        patternList:
+    - hashName: "AK-47 | Slate (Field-Tested)"
+      maximalPage: 30
+      stickersModule:
+        enabled: true
+        minimalStickersPrice: 500.0

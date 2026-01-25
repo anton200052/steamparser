@@ -1,9 +1,8 @@
 package me.vasylkov.steamparser.apache_client.component;
 
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.apache_client.entity.ApacheClientProxyWrapper;
-import me.vasylkov.steamparser.common.component.ProxyValidator;
-import me.vasylkov.steamparser.common.enums.ProxyType;
+import me.vasylkov.steamparser.apache_client.model.ApacheClientProxyWrapper;
+import me.vasylkov.steamparser.apache_client.model.ProxyType;
 import org.slf4j.Logger;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -23,14 +22,14 @@ public class ApacheClientProxyListConverter implements Converter<List<String>, L
     public List<ApacheClientProxyWrapper> convert(List<String> source)
     {
         List<ApacheClientProxyWrapper> proxies = new ArrayList<>();
-        logger.info("Добавляем прокси.");
+        logger.info("Init SELENIUM proxies");
 
         for (String proxyString : source)
         {
             ProxyType proxyType = proxyValidator.getProxyType(proxyString);
             if (proxyType == ProxyType.INVALID)
             {
-                logger.error("Адрес прокси {} указан в ошибочном формате, прокси добавлен не будет.", proxyString);
+                logger.error("Proxy {} in wrong format, this proxy will not be used.", proxyString);
                 continue;
             }
 

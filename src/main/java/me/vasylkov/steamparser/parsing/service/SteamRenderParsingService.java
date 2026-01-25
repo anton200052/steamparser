@@ -2,20 +2,22 @@ package me.vasylkov.steamparser.parsing.service;
 
 import me.vasylkov.steamparser.apache_client.component.ApacheClientAndProxyChanger;
 import me.vasylkov.steamparser.apache_client.component.ApacheClientFactory;
-import me.vasylkov.steamparser.apache_client.entity.ApacheClientWrapper;
-import me.vasylkov.steamparser.common.abstraction.MessagesSender;
-import me.vasylkov.steamparser.data.component.ItemQueueManager;
-import me.vasylkov.steamparser.data.component.UrlGenerator;
-import me.vasylkov.steamparser.data.entity.Item;
+import me.vasylkov.steamparser.apache_client.model.ApacheClientWrapper;
+import me.vasylkov.steamparser.notificator.service.MessagesSender;
+import me.vasylkov.steamparser.config_data.component.ItemQueueManager;
+import me.vasylkov.steamparser.config_data.component.UrlGenerator;
+import me.vasylkov.steamparser.config_data.model.PricedItem;
+import me.vasylkov.steamparser.parsing.component.BlacklistChecker;
 import me.vasylkov.steamparser.parsing.component.PageAnalyser;
 import me.vasylkov.steamparser.parsing.component.ParsingStatus;
 import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
-import me.vasylkov.steamparser.parsing.entity.AnalysingResult;
-import me.vasylkov.steamparser.parsing.entity.ListingWithStickersMarkup;
-import me.vasylkov.steamparser.parsing.entity.Page;
+import me.vasylkov.steamparser.parsing.model.AnalysingResult;
+import me.vasylkov.steamparser.parsing.model.ListingWithStickersMarkup;
+import me.vasylkov.steamparser.parsing.model.ProfitableListing;
+import me.vasylkov.steamparser.parsing.model.Page;
 import me.vasylkov.steamparser.parsing.exception.TooManyRequestsException;
 import me.vasylkov.steamparser.parsing.exception.UnknownErrorException;
-import me.vasylkov.steamparser.steamrender.component.SteamPageFetcher;
+import me.vasylkov.steamparser.parsing.component.SteamPageFetcher;
 import org.slf4j.Logger;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -35,8 +37,9 @@ public class SteamRenderParsingService implements ParsingService
     private final ApacheClientAndProxyChanger apacheClientAndProxyChanger;
     private final PageAnalyser pageAnalyser;
     private final MessagesSender messagesSender;
+    private final BlacklistChecker blacklistChecker;
 
-    public SteamRenderParsingService(ApacheClientFactory apacheClientFactory, ParsingStatus parsingStatus, Logger logger, ItemQueueManager itemQueueManager, ParsingProperties parsingProperties, UrlGenerator urlGenerator, SteamPageFetcher steamPageFetcher, ApacheClientAndProxyChanger apacheClientAndProxyChanger, PageAnalyser pageAnalyser, MessagesSender messagesSender)
+    public SteamRenderParsingService(ApacheClientFactory apacheClientFactory, ParsingStatus parsingStatus, Logger logger, ItemQueueManager itemQueueManager, ParsingProperties parsingProperties, UrlGenerator urlGenerator, SteamPageFetcher steamPageFetcher, ApacheClientAndProxyChanger apacheClientAndProxyChanger, PageAnalyser pageAnalyser, MessagesSender messagesSender, BlacklistChecker blacklistChecker)
     {
         this.apacheClientFactory = apacheClientFactory;
         this.parsingStatus = parsingStatus;
@@ -48,15 +51,15 @@ public class SteamRenderParsingService implements ParsingService
         this.apacheClientAndProxyChanger = apacheClientAndProxyChanger;
         this.pageAnalyser = pageAnalyser;
         this.messagesSender = messagesSender;
+        this.blacklistChecker = blacklistChecker;
     }
 
     @Async
     @Override
-    public void executeAsyncParsingTask()
+    public void executeParsingTask()
     {
         parseItems();
     }
-
 
     private void parseItems()
     {
@@ -64,7 +67,7 @@ public class SteamRenderParsingService implements ParsingService
         try
         {
             apacheClientWrapper = apacheClientFactory.createApacheClientWrapper();
-            Item lastAvailable = null;
+            PricedItem lastAvailable = null;
             while (parsingStatus.isParsingStarted())
             {
                 lastAvailable = processNextAvailableItem(apacheClientWrapper, lastAvailable);
@@ -84,16 +87,16 @@ public class SteamRenderParsingService implements ParsingService
             {
                 apacheClientWrapper.getCloseableHttpClient().close();
             }
-            catch (IOException e)
+            catch (IOException | NullPointerException e)
             {
                 logger.error("Ошибка закрытия клиента Apache");
             }
         }
     }
 
-    private Item processNextAvailableItem(ApacheClientWrapper apacheClientWrapper, Item lastAvailable)
+    private PricedItem processNextAvailableItem(ApacheClientWrapper apacheClientWrapper, PricedItem lastAvailable)
     {
-        Item available = itemQueueManager.getAvailableOrLastItem(lastAvailable, parsingProperties.isCycle());
+        PricedItem available = itemQueueManager.getAvailableOrLastItem(lastAvailable, parsingProperties.isCycle());
         if (available != null)
         {
             parseItem(available, apacheClientWrapper);
@@ -107,43 +110,54 @@ public class SteamRenderParsingService implements ParsingService
         return available;
     }
 
-    private void parseItem(Item item, ApacheClientWrapper apacheClientWrapper)
+    private void parseItem(PricedItem item, ApacheClientWrapper apacheClientWrapper)
     {
         String itemName = item.getHashName();
-        logger.info("Начинаем парсинг предмета {}", item.getHashName());
         int currentPageNum = 1;
+        int maximalAllowedPage = 1;
 
-        while (currentPageNum <= item.getMaximalPage())
+        while (currentPageNum <= item.getMaximalPage() && currentPageNum <= maximalAllowedPage)
         {
             if (!parsingStatus.isParsingStarted())
             {
                 return;
             }
 
+            logger.info("Parsing item: {}, Page: {}", item.getHashName(), currentPageNum);
+
             Page steamPage = null;
             while (steamPage == null)
             {
-                System.out.println(1);
                 try
                 {
                     steamPage = steamPageFetcher.fetchSteamPage(apacheClientWrapper.getCloseableHttpClient(), itemName, currentPageNum);
+                    maximalAllowedPage = steamPage.getMaxPage();
                 }
                 catch (TooManyRequestsException e)
                 {
+                    logger.info("Too many requests");
                     apacheClientAndProxyChanger.changeProxyAndApacheClient(apacheClientWrapper);
-                    
                 }
                 catch (UnknownErrorException ignored)
                 {
-
+                    logger.info("Unknown error, retry");
                 }
             }
 
             AnalysingResult steamAnalysingResult = pageAnalyser.analysePage(steamPage, item);
 
-            for (ListingWithStickersMarkup listing : steamAnalysingResult.getProfitableListings())
+            for (ProfitableListing listing : steamAnalysingResult.getProfitableListings())
             {
-                messagesSender.sendProfitableItemData(listing.getImgUrl(), listing.getHashName(), item.getAveragePrice(), listing.getPrice(), currentPageNum, listing.getStickers(), listing.getTotalStickersPrice(), listing.getPriceWithStickersMarkup(), listing.getStickersMarkupPercentage());
+                switch (listing.getProfitableListingType()) {
+                    case STICKERS -> {
+                        if (listing instanceof ListingWithStickersMarkup stickersListing) {
+                            messagesSender.sendProfitableStickersItemData(stickersListing.getImgUrl(), stickersListing.getHashName(), item.getAveragePrice(), stickersListing.getPrice(), currentPageNum, stickersListing.getStickers(), stickersListing.getTotalStickersPrice(), stickersListing.getPriceWithStickersMarkup(), stickersListing.getStickersMarkupPercentage());
+                        }
+                    }
+                    case FLOAT -> messagesSender.sendFloatItemData(listing.getImgUrl(), listing.getHashName(), item.getAveragePrice(), listing.getPrice(), currentPageNum, listing.getFloatValue());
+                    case PATTERN -> messagesSender.sendPatternItemData(listing.getImgUrl(), listing.getHashName(), item.getAveragePrice(), listing.getPrice(), currentPageNum, String.valueOf(listing.getPattern()));
+                }
+                blacklistChecker.addToBlacklist(listing.getListingId());
             }
 
             currentPageNum = currentPageNum + 1;

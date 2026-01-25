@@ -1,7 +1,6 @@
 package me.vasylkov.steamparser.parsing.configuration;
 
 import lombok.Data;
-import me.vasylkov.steamparser.parsing.enums.ParsingType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,7 +11,6 @@ import java.util.List;
 @ConfigurationProperties(prefix = "parsing")
 public class ParsingProperties
 {
-    private ParsingType type;
     private boolean cycle;
     private int threads;
     private boolean enableProxy;

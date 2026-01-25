@@ -1,7 +1,7 @@
 package me.vasylkov.steamparser.apache_client.component;
 
-import me.vasylkov.steamparser.apache_client.entity.ApacheClientProxy;
-import me.vasylkov.steamparser.apache_client.entity.ApacheClientProxyWrapper;
+import me.vasylkov.steamparser.apache_client.model.ApacheClientProxy;
+import me.vasylkov.steamparser.apache_client.model.ApacheClientProxyWrapper;
 import me.vasylkov.steamparser.common.abstraction.ProxyFactory;
 import org.apache.hc.client5.http.auth.AuthScope;
 import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;

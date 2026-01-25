@@ -1,20 +1,22 @@
 package me.vasylkov.steamparser.apache_client.component;
 
-import me.vasylkov.steamparser.apache_client.entity.ApacheClientProxy;
-import me.vasylkov.steamparser.apache_client.entity.ApacheClientProxyWrapper;
-import me.vasylkov.steamparser.apache_client.entity.ApacheClientWrapper;
+import lombok.RequiredArgsConstructor;
+import me.vasylkov.steamparser.apache_client.model.ApacheClientProxyWrapper;
+import me.vasylkov.steamparser.apache_client.model.ApacheClientWrapper;
+import org.apache.hc.client5.http.cookie.BasicCookieStore;
+import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
 import org.apache.hc.client5.http.impl.routing.DefaultProxyRoutePlanner;
-import org.apache.hc.client5.http.impl.routing.DefaultRoutePlanner;
 import org.apache.hc.client5.http.routing.HttpRoutePlanner;
 import org.apache.hc.core5.http.HttpHost;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class ApacheClientFactory
 {
     public ApacheClientWrapper createApacheClientWrapper(ApacheClientProxyWrapper proxyWrapper)
@@ -24,17 +26,19 @@ public class ApacheClientFactory
 
         BasicCredentialsProvider credentialsProvider = proxyWrapper.getProxy().getBasicCredentialsProvider();
 
-        HttpClientBuilder httpClientBuilder = HttpClients.custom();
+        CookieStore cookieStore = new BasicCookieStore();
 
-        if (credentialsProvider != null)
-        {
+
+        HttpClientBuilder httpClientBuilder = HttpClients.custom()
+                .setRoutePlanner(routePlanner)
+                .setDefaultCookieStore(cookieStore)
+                .setConnectionManager(new PoolingHttpClientConnectionManager());
+
+        if (credentialsProvider != null) {
             httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
         }
 
-        CloseableHttpClient httpClient = httpClientBuilder.setRoutePlanner(routePlanner)
-            .setConnectionManager(new PoolingHttpClientConnectionManager())
-            .build();
-
+        CloseableHttpClient httpClient = httpClientBuilder.build();
         return new ApacheClientWrapper(httpClient, proxyWrapper);
     }
 

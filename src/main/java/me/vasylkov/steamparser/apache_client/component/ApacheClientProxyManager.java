@@ -2,9 +2,9 @@ package me.vasylkov.steamparser.apache_client.component;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.apache_client.entity.ApacheClientProxyWrapper;
-import me.vasylkov.steamparser.common.abstraction.ProxyManager;
-import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
+import me.vasylkov.steamparser.apache_client.model.ApacheClientProxy;
+import me.vasylkov.steamparser.apache_client.model.ApacheClientProxyWrapper;
+ import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,20 +14,19 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
-public class ApacheClientProxyManager implements ProxyManager<ApacheClientProxyWrapper>
+public class ApacheClientProxyManager implements
 {
-    private List<ApacheClientProxyWrapper> proxyList;
+    private List<ApacheClientProxy> proxyList;
     private final ApacheClientProxyListConverter apacheClientProxyListConverter;
     private final ParsingProperties parsingProperties;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    @Override
-    public synchronized void blockProxy(ApacheClientProxyWrapper proxyWrapper)
+    public synchronized void blockProxy(ApacheClientProxy proxy)
     {
-        if (!proxyWrapper.isBlocked())
+        if (!proxy.isBlocked())
         {
-            proxyWrapper.setBlocked(true);
-            scheduler.schedule(() -> unblockProxy(proxyWrapper), parsingProperties.getProxyBlockingTime(), TimeUnit.SECONDS);
+            proxy.setBlocked(true);
+            scheduler.schedule(() -> unblockProxy(proxy), parsingProperties.getProxyBlockingTime(), TimeUnit.SECONDS);
         }
     }
 
