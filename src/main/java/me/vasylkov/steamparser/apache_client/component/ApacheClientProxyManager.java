@@ -2,62 +2,49 @@ package me.vasylkov.steamparser.apache_client.component;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import me.vasylkov.steamparser.apache_client.model.ApacheClientProxy;
-import me.vasylkov.steamparser.apache_client.model.ApacheClientProxyWrapper;
- import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
+import me.vasylkov.steamparser.parsing.configuration.ParsingProperties;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.Objects;
+import java.util.concurrent.DelayQueue;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-public class ApacheClientProxyManager implements
+public class ApacheClientProxyManager
 {
-    private List<ApacheClientProxy> proxyList;
-    private final ApacheClientProxyListConverter apacheClientProxyListConverter;
+    private final DelayQueue<ApacheClientProxy> proxyQueue = new DelayQueue<>();
+    private final StringToApacheClientProxyConverter proxyConverter;
     private final ParsingProperties parsingProperties;
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    public synchronized void blockProxy(ApacheClientProxy proxy)
-    {
-        if (!proxy.isBlocked())
-        {
-            proxy.setBlocked(true);
-            scheduler.schedule(() -> unblockProxy(proxy), parsingProperties.getProxyBlockingTime(), TimeUnit.SECONDS);
-        }
+    public ApacheClientProxy borrowProxy() throws InterruptedException {
+        return proxyQueue.take();
     }
 
-    @Override
-    public synchronized void unblockProxy(ApacheClientProxyWrapper proxyWrapper)
-    {
-        if (proxyWrapper.isBlocked())
-        {
-            proxyWrapper.setBlocked(false);
-        }
-    }
-
-    @Override
-    public synchronized ApacheClientProxyWrapper getAvailableProxy()
-    {
-        for (ApacheClientProxyWrapper proxyWrapper : proxyList)
-        {
-            if (!proxyWrapper.isBlocked())
-            {
-                return proxyWrapper;
-            }
-        }
-        return null;
+    public void returnProxy(ApacheClientProxy proxy, long cooldownMilliseconds) {
+        proxy.setCooldown(cooldownMilliseconds);
+        proxyQueue.offer(proxy);
     }
 
     @PostConstruct
-    public void initProxyList()
-    {
-        if (parsingProperties.isEnableProxy())
-        {
-            proxyList = apacheClientProxyListConverter.convert(parsingProperties.getProxyList());
+    public void initProxyQueue() {
+        if (!parsingProperties.isEnableProxy()) {
+            log.info("Proxy usage is disabled in properties.");
+            return;
         }
+
+        if (parsingProperties.getProxyList() == null || parsingProperties.getProxyList().isEmpty()) {
+            log.warn("Proxy is enabled, but the proxy list is empty!");
+            return;
+        }
+
+        parsingProperties.getProxyList().stream()
+                .map(proxyConverter::convert)
+                .filter(Objects::nonNull)
+                .forEach(proxyQueue::offer);
+
+        log.info("Successfully loaded {} proxies into the DelayQueue.", proxyQueue.size());
     }
 }

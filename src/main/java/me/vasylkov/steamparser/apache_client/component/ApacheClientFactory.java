@@ -1,8 +1,7 @@
 package me.vasylkov.steamparser.apache_client.component;
 
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.apache_client.model.ApacheClientProxyWrapper;
-import me.vasylkov.steamparser.apache_client.model.ApacheClientWrapper;
+import me.vasylkov.steamparser.apache_client.model.ApacheClientProxy;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.cookie.CookieStore;
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
@@ -19,12 +18,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ApacheClientFactory
 {
-    public ApacheClientWrapper createApacheClientWrapper(ApacheClientProxyWrapper proxyWrapper)
+    public CloseableHttpClient createApacheClient(ApacheClientProxy proxy)
     {
-        HttpHost httpHost = proxyWrapper.getProxy().getHttpHost();
+        HttpHost httpHost = proxy.getHttpHost();
         HttpRoutePlanner routePlanner = new DefaultProxyRoutePlanner(httpHost);
 
-        BasicCredentialsProvider credentialsProvider = proxyWrapper.getProxy().getBasicCredentialsProvider();
+        BasicCredentialsProvider credentialsProvider = proxy.getBasicCredentialsProvider();
 
         CookieStore cookieStore = new BasicCookieStore();
 
@@ -38,13 +37,11 @@ public class ApacheClientFactory
             httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
         }
 
-        CloseableHttpClient httpClient = httpClientBuilder.build();
-        return new ApacheClientWrapper(httpClient, proxyWrapper);
+        return httpClientBuilder.build();
     }
 
-    public ApacheClientWrapper createApacheClientWrapper()
+    public CloseableHttpClient createApacheClient()
     {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        return new ApacheClientWrapper(httpClient, null);
+        return HttpClients.createDefault();
     }
 }

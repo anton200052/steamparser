@@ -64,17 +64,12 @@ public class ItemQueueManager
         return null;
     }
 
-    public synchronized PricedItem getAvailableOrLastItem(PricedItem lastAvailable, boolean isParsingCycled)
+    public synchronized PricedItem getAvailableItem()
     {
         PricedItem currentAvailable = getAndBlockFirstAvailableItem();
         if (currentAvailable == null)
         {
-            if (lastAvailable == null || !isParsingCycled)
-            {
-                logger.info("Предметов для потока {} нет, поток не будет продолжать работу", Thread.currentThread().getId());
-                return null;
-            }
-            currentAvailable = lastAvailable;
+            logger.info("Предметов для потока {} нет, поток не будет продолжать работу", Thread.currentThread().getId());
         }
         return currentAvailable;
     }

@@ -67,11 +67,10 @@ public class SteamRenderParsingService implements ParsingService
         try
         {
             apacheClientWrapper = apacheClientFactory.createApacheClientWrapper();
-            PricedItem lastAvailable = null;
             while (parsingStatus.isParsingStarted())
             {
-                lastAvailable = processNextAvailableItem(apacheClientWrapper, lastAvailable);
-                if (lastAvailable == null)
+                PricedItem available = processNextAvailableItem(apacheClientWrapper);
+                if (available == null)
                 {
                     return;
                 }
@@ -94,9 +93,9 @@ public class SteamRenderParsingService implements ParsingService
         }
     }
 
-    private PricedItem processNextAvailableItem(ApacheClientWrapper apacheClientWrapper, PricedItem lastAvailable)
+    private PricedItem processNextAvailableItem(ApacheClientWrapper apacheClientWrapper)
     {
-        PricedItem available = itemQueueManager.getAvailableOrLastItem(lastAvailable, parsingProperties.isCycle());
+        PricedItem available = itemQueueManager.getAvailableItem();
         if (available != null)
         {
             parseItem(available, apacheClientWrapper);

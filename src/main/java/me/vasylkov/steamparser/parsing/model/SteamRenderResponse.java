@@ -7,6 +7,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +31,9 @@ public class SteamRenderResponse
     public SteamAsset getAssetBySteamRenderListing(SteamRenderListing steamRenderListing) {
         String appId = String.valueOf(steamRenderListing.getAsset().getAppId());
         String contextId = steamRenderListing.getAsset().getContextId();
+        String assetId = steamRenderListing.getAsset().getId();
 
-        return assets.get(appId).get(contextId).get(steamRenderListing.getAsset().getId());
+        return assets.get(appId).get(contextId).get(assetId);
     }
 
     @Data
@@ -134,9 +136,142 @@ public class SteamRenderResponse
             @JsonProperty("propertyid")
             private Integer propertyId;
             @JsonProperty("float_value")
-            private String floatValue;
+            private BigDecimal floatValue;
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             @JsonProperty("int_value")
-            private String intValue;
+            private Integer intValue;
             @JsonProperty("string_value")
             private String stringValue;
         }

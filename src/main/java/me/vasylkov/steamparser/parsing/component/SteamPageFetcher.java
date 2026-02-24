@@ -1,15 +1,12 @@
 package me.vasylkov.steamparser.parsing.component;
 
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.csfloat.component.CSFloatApiResponseFetcher;
-import me.vasylkov.steamparser.csfloat.model.CSFloatApiResponse;
 import me.vasylkov.steamparser.parsing.model.*;
-import me.vasylkov.steamparser.parsing.configuration.SteamRenderProperties;
 import me.vasylkov.steamparser.parsing.model.SteamRenderResponse;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,53 +16,61 @@ import java.util.Map;
 public class SteamPageFetcher
 {
     private final SteamRenderResponseFetcher steamRenderResponseFetcher;
-    private final CSFloatApiResponseFetcher csFloatApiResponseFetcher;
-    private final SteamPageDataConverter steamPageDataConverter;
-    private final SteamRenderProperties steamRenderProperties;
-    private final Logger logger;
 
     public Page fetchSteamPage(CloseableHttpClient closeableHttpClient, String itemName, int humanPageNum)
     {
-        waitBeforeFetching();
-
         int zeroBasedPageNum = humanPageNum - 1;
 
         SteamRenderResponse steamRenderResponse = steamRenderResponseFetcher.fetchSteamRenderPageByItemName(closeableHttpClient, itemName, zeroBasedPageNum);
         int maxHumanPage = (steamRenderResponse.getTotalCount() + 9) / 10;
         List<Listing> listings = new ArrayList<>();
 
-        for (Map.Entry<String, SteamRenderResponse.SteamRenderListing> steamRenderListingEntry : steamRenderResponse.getListingInfo().entrySet())
+        for (Map.Entry<String, SteamRenderResponse.SteamRenderListing> steamRenderListingEntry : steamRenderResponse.getListingInfoMap().entrySet())
         {
             SteamRenderResponse.SteamRenderListing steamRenderListing = steamRenderListingEntry.getValue();
             String listingId = steamRenderListing.getListingId();
-            String assetId = steamRenderListing.getAsset().getId();
-            CSFloatApiResponse csFloatApiResponse = csFloatApiResponseFetcher.fetchCSFloatResponse(steamRenderListing.getAsset().getMarketActions().get(0).resolveLink(listingId, assetId));
 
-            double price = steamPageDataConverter.convertToNormalPrice(steamRenderListing.getConvertedPrice(), steamRenderListing.getConvertedFee());
+            SteamRenderResponse.SteamAsset steamAsset = steamRenderResponse.getAssetBySteamRenderListing(steamRenderListing);
+            List<Sticker> stickers = steamAsset.getStickers();
+            String imgUrl = steamAsset.getIconUrl();
+            Integer pattern = steamAsset.getAssetProperties().stream()
+                    .filter(p -> p.getPropertyId() == 1)
+                    .findFirst()
+                    .map(SteamRenderResponse.SteamAsset.AssetProperty::getIntValue)
+                    .orElse(0);
+            BigDecimal floatValue = steamAsset.getAssetProperties().stream()
+                    .filter(p -> p.getPropertyId() == 2)
+                    .findFirst()
+                    .map(SteamRenderResponse.SteamAsset.AssetProperty::getFloatValue)
+                    .orElse(BigDecimal.valueOf(0));
+
+            double price = convertToNormalPrice(steamRenderListing.getConvertedPrice(), steamRenderListing.getConvertedFee());
             if (price == 0.0) {
                 continue;
             }
 
-            CSFloatApiResponse.CSFloatItemInfo itemInfo = csFloatApiResponse.getItemInfo();
-
-            List<Sticker> stickers = steamPageDataConverter.convertCSFloatStickersListToSteamStickersList(itemInfo.getStickers());
-            int pattern = itemInfo.getPaintSeed();
-            double floatVal = itemInfo.getFloatValue();
-            String imgUrl = itemInfo.getImageUrl();
-
-            Listing listing = new Listing(listingId, itemName, price, stickers, floatVal, pattern, imgUrl);
+            Listing listing = new Listing(listingId, itemName, price, stickers, floatValue, pattern, imgUrl);
             listings.add(listing);
         }
 
         return new Page(listings, humanPageNum, maxHumanPage);
     }
 
-    private void waitBeforeFetching() {
+    public double convertToNormalPrice(int convertedPrice, int convertedFee)
+    {
+        if (convertedPrice != 0 && convertedFee != 0)
+        {
+            return (convertedPrice / 100.0) + (convertedFee / 100.0);
+        }
+        return 0.0;
+    }
+
+    /*private void waitBeforeFetching() {
         try {
             Thread.sleep(steamRenderProperties.getPageChangingDuration() * 1000L);
         }
         catch (InterruptedException e) {
             logger.error("Ошибка при ожидании перед сменой страницы", e);
         }
-    }
+    }*/
 }
