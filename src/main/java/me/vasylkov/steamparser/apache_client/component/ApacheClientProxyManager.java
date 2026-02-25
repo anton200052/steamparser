@@ -19,7 +19,12 @@ public class ApacheClientProxyManager
     private final StringToApacheClientProxyConverter proxyConverter;
     private final ParsingProperties parsingProperties;
 
+    private boolean hasProxies = false;
+
     public ApacheClientProxy borrowProxy() throws InterruptedException {
+        if (!hasProxies) {
+            return null;
+        }
         return proxyQueue.take();
     }
 
@@ -45,6 +50,11 @@ public class ApacheClientProxyManager
                 .filter(Objects::nonNull)
                 .forEach(proxyQueue::offer);
 
-        log.info("Successfully loaded {} proxies into the DelayQueue.", proxyQueue.size());
+        if (!proxyQueue.isEmpty()) {
+            hasProxies = true;
+            log.info("Successfully loaded {} proxies into the DelayQueue.", proxyQueue.size());
+        } else {
+            log.warn("Proxy list contained only invalid entries. Running without proxies.");
+        }
     }
 }
