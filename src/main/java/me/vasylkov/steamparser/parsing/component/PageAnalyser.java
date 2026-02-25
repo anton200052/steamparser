@@ -6,12 +6,10 @@ import me.vasylkov.steamparser.config_data.model.PatternModule;
 import me.vasylkov.steamparser.config_data.model.PricedItem;
 import me.vasylkov.steamparser.config_data.model.StickersModule;
 import me.vasylkov.steamparser.parsing.enums.ProfitableListingType;
-import me.vasylkov.steamparser.parsing.model.AnalysingResult;
-import me.vasylkov.steamparser.parsing.model.Listing;
-import me.vasylkov.steamparser.parsing.model.Page;
-import me.vasylkov.steamparser.parsing.model.ProfitableListing;
+import me.vasylkov.steamparser.parsing.model.*;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,21 +28,25 @@ public class PageAnalyser {
         List<ProfitableListing> profitableListings = new ArrayList<>();
         for (Listing listing : page.getListings()) {
             if (item.isValid() && !blacklistChecker.isBlacklisted(listing.getListingId())) {
-                if (item.getStickersModule().getEnabled()) {
+
+                StickersModule stickersModule = item.getStickersModule();
+                if (stickersModule != null && stickersModule.getEnabled()) {
                     ProfitableListing profitableListing = getIfProfitableStickerListing(listing, item);
                     if (profitableListing != null) {
                         profitableListings.add(profitableListing);
                     }
                 }
 
-                if (item.getFloatModule().getEnabled()) {
+                FloatModule floatModule = item.getFloatModule();
+                if (floatModule != null && floatModule.getEnabled()) {
                     ProfitableListing profitableListing = getIfProfitableFloatListing(listing, item);
                     if (profitableListing != null) {
                         profitableListings.add(profitableListing);
                     }
                 }
 
-                if (item.getPatternModule().getEnabled()) {
+                PatternModule patternModule = item.getPatternModule();
+                if (patternModule != null && patternModule.getEnabled()) {
                     ProfitableListing profitableListing = getIfProfitablePatternListing(listing, item);
                     if (profitableListing != null) {
                         profitableListings.add(profitableListing);
@@ -58,18 +60,20 @@ public class PageAnalyser {
     private ProfitableListing getIfProfitableStickerListing(Listing listing, PricedItem item) {
         StickersModule stickersModule = item.getStickersModule();
         double totalStickersPrice = priceCalculator.calculateTotalStickersPrice(listing.getStickers());
+        double priceWithStickersMarkup = priceCalculator.calculateAverageStickersMarkup(totalStickersPrice, item.getAveragePrice());
+        double stickersMarkupPercent = priceCalculator.calculateItemMarkupByStickers(priceWithStickersMarkup, item.getAveragePrice());
 
         if (totalStickersPrice >= stickersModule.getMinimalStickersPrice()) {
-            return new ProfitableListing(listing.getListingId(), listing.getHashName(), listing.getPrice(), listing.getStickers(), listing.getFloatValue(), listing.getPattern(), listing.getImgUrl(), ProfitableListingType.STICKERS);
+            return new ListingWithStickersMarkup(listing.getListingId(), listing.getHashName(), listing.getPrice(), listing.getStickers(), listing.getFloatValue(), listing.getPattern(), listing.getImgUrl(), totalStickersPrice, priceWithStickersMarkup, stickersMarkupPercent);
         }
         return null;
     }
 
     private ProfitableListing getIfProfitableFloatListing(Listing listing, PricedItem item) {
         FloatModule floatModule = item.getFloatModule();
-        double floatVal = listing.getFloatValue();
+        BigDecimal floatVal = listing.getFloatValue();
 
-        if (floatVal >= floatModule.getMinFloat() && floatVal <= floatModule.getMaxFloat()) {
+        if (floatVal.compareTo(floatModule.getMinFloat()) >= 0 && floatVal.compareTo(floatModule.getMaxFloat()) <= 0) {
             return new ProfitableListing(listing.getListingId(), listing.getHashName(), listing.getPrice(), listing.getStickers(), listing.getFloatValue(), listing.getPattern(), listing.getImgUrl(), ProfitableListingType.FLOAT);
         }
         return null;

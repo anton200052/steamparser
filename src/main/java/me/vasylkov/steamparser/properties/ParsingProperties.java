@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.parsing.configuration;
+package me.vasylkov.steamparser.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -14,6 +14,8 @@ public class ParsingProperties
     private boolean cycle;
     private int threads;
     private boolean enableProxy;
-    private int proxyBlockingTime;
+    private boolean useLocalConnection;
+    private int connectionRequestsDelay;
+    private int connectionBlockingTime;
     private List<String> proxyList;
 }

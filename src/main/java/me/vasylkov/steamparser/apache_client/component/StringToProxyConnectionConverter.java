@@ -1,25 +1,25 @@
 package me.vasylkov.steamparser.apache_client.component;
 
 import lombok.RequiredArgsConstructor;
-import me.vasylkov.steamparser.apache_client.model.ApacheClientProxy;
+import lombok.extern.slf4j.Slf4j;
+import me.vasylkov.steamparser.apache_client.model.ClientConnection;
 import me.vasylkov.steamparser.apache_client.model.ProxyType;
-import org.slf4j.Logger;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-public class StringToApacheClientProxyConverter implements Converter<String, ApacheClientProxy> {
+public class StringToProxyConnectionConverter implements Converter<String, ClientConnection> {
     private final ProxyValidator proxyValidator;
-    private final ApacheClientProxyFactory proxyFactory;
-    private final Logger logger;
+    private final ProxyConnectionFactory proxyFactory;
 
     @Override
-    public ApacheClientProxy convert(String source) {
+    public ClientConnection convert(String source) {
 
         ProxyType proxyType = proxyValidator.getProxyType(source);
         if (proxyType == ProxyType.INVALID) {
-            logger.error("Proxy {} in wrong format, this proxy will not be used.", source);
+            log.error("Proxy {} in wrong format, this proxy will not be used.", source);
             return null;
         }
 
@@ -29,7 +29,7 @@ public class StringToApacheClientProxyConverter implements Converter<String, Apa
         String address = ipAndPort[0];
         int port = Integer.parseInt(ipAndPort[1]);
 
-        ApacheClientProxy proxy;
+        ClientConnection proxy;
         if (proxyType == ProxyType.DEFAULT) {
             proxy = proxyFactory.createDefaultProxy(address, port);
         } else {

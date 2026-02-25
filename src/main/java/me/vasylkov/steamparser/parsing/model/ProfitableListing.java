@@ -5,6 +5,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import me.vasylkov.steamparser.parsing.enums.ProfitableListingType;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 @Data
@@ -13,7 +15,7 @@ import java.util.List;
 public class ProfitableListing extends Listing {
     private ProfitableListingType profitableListingType;
 
-    public ProfitableListing(String listingId, String hashName, double price, List<Sticker> stickers, double floatValue, int pattern, String imgUrl, ProfitableListingType profitableListingType) {
+    public ProfitableListing(String listingId, String hashName, double price, List<Sticker> stickers, BigDecimal floatValue, int pattern, String imgUrl, ProfitableListingType profitableListingType) {
         super(listingId, hashName, price, stickers, floatValue, pattern, imgUrl);
         this.profitableListingType = profitableListingType;
     }

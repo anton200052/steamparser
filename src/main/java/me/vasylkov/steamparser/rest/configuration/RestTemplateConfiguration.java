@@ -1,5 +1,6 @@
 package me.vasylkov.steamparser.rest.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.springframework.context.annotation.Bean;
@@ -16,5 +17,11 @@ public class RestTemplateConfiguration
         CloseableHttpClient httpClient = HttpClients.createDefault();
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
         return new RestTemplate(factory);
+    }
+
+    @Bean
+    public ObjectMapper objectMapper()
+    {
+        return new ObjectMapper();
     }
 }

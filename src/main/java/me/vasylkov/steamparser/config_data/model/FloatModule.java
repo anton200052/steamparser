@@ -5,13 +5,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class FloatModule extends Module {
-    private Double minFloat;
-    private Double maxFloat;
+    private BigDecimal minFloat;
+    private BigDecimal maxFloat;
 
     @Override
     public boolean isValid()

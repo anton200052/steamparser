@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.config_data.configuration;
+package me.vasylkov.steamparser.properties;
 
 import lombok.Data;
 import me.vasylkov.steamparser.config_data.model.Item;

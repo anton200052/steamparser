@@ -1,9 +1,9 @@
 package me.vasylkov.steamparser.notificator.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import me.vasylkov.steamparser.parsing.model.Sticker;
-import me.vasylkov.steamparser.notificator.configuration.TelegramProperties;
-import org.slf4j.Logger;
+import me.vasylkov.steamparser.properties.TelegramProperties;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -11,13 +11,14 @@ import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import java.math.BigDecimal;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TelegramMessagesSender implements MessagesSender {
     private final TelegramClient client;
-    private final Logger logger;
     private final TelegramProperties telegramProperties;
 
     @Override
@@ -28,7 +29,7 @@ public class TelegramMessagesSender implements MessagesSender {
                 client.execute(sendMessage);
             }
             catch (TelegramApiException e) {
-                logger.error("Произошла ошибка при отправке сообщения в тг. бота: ", e);
+                log.error("Произошла ошибка при отправке сообщения в тг. бота: ", e);
             }
         }
     }
@@ -42,7 +43,7 @@ public class TelegramMessagesSender implements MessagesSender {
                 client.execute(sendPhotoRequest);
             }
             catch (TelegramApiException e) {
-                logger.error("Произошла ошибка при отправке фотографии в тг. бота: ", e);
+                log.error("Произошла ошибка при отправке фотографии в тг. бота: ", e);
             }
         }
     }
@@ -61,7 +62,6 @@ public class TelegramMessagesSender implements MessagesSender {
      */
     @Override
     public void sendProfitableStickersItemData(String imgUrl, String hashName, double averageItemPrice, double currentPrice, int position, List<Sticker> steamStickers, double totalStickersPrice, double priceWithStickersMarkup, double stickersMarkupPercentage) {
-
         StringBuilder captionBuilder = buildBaseCaption(hashName, averageItemPrice, currentPrice, position);
 
         captionBuilder.append("Стикеры:\n");
@@ -87,11 +87,10 @@ public class TelegramMessagesSender implements MessagesSender {
      * @param itemFloat float value of the skin (0.0 – 1.0)
      */
     @Override
-    public void sendFloatItemData(String imgUrl, String hashName, double averageItemPrice, double currentPrice, int position, double itemFloat) {
+    public void sendFloatItemData(String imgUrl, String hashName, double averageItemPrice, double currentPrice, int position, BigDecimal itemFloat) {
         StringBuilder captionBuilder = buildBaseCaption(hashName, averageItemPrice, currentPrice, position);
 
-        double roundedFloat = Math.round(itemFloat * 1000.0) / 1000.0; // округление до 0.001
-        captionBuilder.append("Флот: ").append(roundedFloat).append("\n");
+        captionBuilder.append("Флот: ").append(itemFloat).append("\n");
 
         sendPhotoWithCaption(captionBuilder.toString(), imgUrl);
     }

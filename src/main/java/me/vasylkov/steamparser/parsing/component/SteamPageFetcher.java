@@ -32,7 +32,7 @@ public class SteamPageFetcher
 
             SteamRenderResponse.SteamAsset steamAsset = steamRenderResponse.getAssetBySteamRenderListing(steamRenderListing);
             List<Sticker> stickers = steamAsset.getStickers();
-            String imgUrl = steamAsset.getIconUrl();
+            String imgUrl = "https://community.akamai.steamstatic.com/economy/image/" + steamAsset.getIconUrl();
             Integer pattern = steamAsset.getAssetProperties().stream()
                     .filter(p -> p.getPropertyId() == 1)
                     .findFirst()
@@ -65,12 +65,4 @@ public class SteamPageFetcher
         return 0.0;
     }
 
-    /*private void waitBeforeFetching() {
-        try {
-            Thread.sleep(steamRenderProperties.getPageChangingDuration() * 1000L);
-        }
-        catch (InterruptedException e) {
-            logger.error("Ошибка при ожидании перед сменой страницы", e);
-        }
-    }*/
 }

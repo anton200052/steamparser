@@ -1,11 +1,20 @@
 package me.vasylkov.steamparser.parsing.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 public class Sticker
 {
     private String hashName;
+    private double price;
+
+    public Sticker(String hashName) {
+        this.hashName = hashName;
+        this.price = 0.0;
+    }
+
+    public Sticker(String hashName, double price) {
+        this.hashName = hashName;
+        this.price = price;
+    }
 }

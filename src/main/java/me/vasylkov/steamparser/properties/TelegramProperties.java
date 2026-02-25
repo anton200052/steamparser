@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.notificator.configuration;
+package me.vasylkov.steamparser.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

@@ -1,22 +1,15 @@
 package me.vasylkov.steamparser.apache_client.model;
 
 import lombok.Data;
-import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
-import org.apache.hc.core5.http.HttpHost;
 
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
 @Data
-public class ApacheClientProxy implements Delayed
-{
-    private BasicCredentialsProvider basicCredentialsProvider;
-    private HttpHost httpHost;
-    private long readyTime;
+public abstract class ClientConnection implements Delayed {
+    protected long readyTime;
 
-    public ApacheClientProxy(BasicCredentialsProvider basicCredentialsProvider, HttpHost httpHost) {
-        this.basicCredentialsProvider = basicCredentialsProvider;
-        this.httpHost = httpHost;
+    public ClientConnection() {
         this.readyTime = System.currentTimeMillis();
     }
 

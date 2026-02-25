@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.parsing.configuration;
+package me.vasylkov.steamparser.properties;
 
 import lombok.Data;
 import me.vasylkov.steamparser.parsing.enums.CurrencyCode;

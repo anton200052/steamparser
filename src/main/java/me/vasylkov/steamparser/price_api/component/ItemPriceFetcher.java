@@ -2,8 +2,8 @@ package me.vasylkov.steamparser.price_api.component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import me.vasylkov.steamparser.price_api.configuration.PriceApiProperties;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
+import me.vasylkov.steamparser.properties.PriceApiProperties;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -12,17 +12,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 @Component
 public class ItemPriceFetcher
 {
-    private final Logger logger;
     private final PriceApiProperties properties;
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
 
-    public ItemPriceFetcher(Logger logger, PriceApiProperties properties, ObjectMapper objectMapper, RestTemplate restTemplate)
+    public ItemPriceFetcher(PriceApiProperties properties, ObjectMapper objectMapper, RestTemplate restTemplate)
     {
-        this.logger = logger;
         this.properties = properties;
         this.objectMapper = objectMapper;
         this.restTemplate = restTemplate;
@@ -32,7 +31,7 @@ public class ItemPriceFetcher
     {
         pauseBeforeRequest();
         double price = getAveragePriceFromApi(priceApiUrl);
-        logger.info("Item or Sticker price: {}", price);
+        log.info("Item or Sticker price: {}", price);
         return price;
     }
 
@@ -40,12 +39,12 @@ public class ItemPriceFetcher
     {
         try
         {
-            Thread.sleep(properties.getItemPriceFetcherDuration() * 1000L);
+            Thread.sleep(properties.getItemPriceFetcherDelay());
         }
         catch (InterruptedException e)
         {
-            logger.warn("Ошибка при ожидании перед получением цены предмета", e);
-            Thread.currentThread().interrupt(); // Восстановление прерванного статуса потока
+            log.warn("Ошибка при ожидании перед получением цены предмета", e);
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -61,7 +60,7 @@ public class ItemPriceFetcher
         }
         catch (RestClientException e)
         {
-            logger.error("Не удалось получить данные из API цен на предметы. Проверьте работоспособность сервиса!");
+            log.error("Не удалось получить данные из API цен на предметы. Проверьте работоспособность сервиса!");
         }
 
         return 0.0;
@@ -78,12 +77,12 @@ public class ItemPriceFetcher
             }
             else
             {
-                logger.error("Ответ от API не успешен!");
+                log.error("Ответ от API не успешен!");
             }
         }
         catch (IOException e)
         {
-            logger.error("Ошибка при парсинге ответа от API!", e);
+            log.error("Ошибка при парсинге ответа от API!", e);
         }
         return 0.0;
     }
