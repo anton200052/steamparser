@@ -9,8 +9,7 @@ import java.util.List;
 @Configuration
 @ConfigurationProperties(prefix = "telegram")
 @Data
-public class TelegramProperties
-{
+public class TelegramProperties {
     private String botToken;
     private List<String> chatIdList;
 }

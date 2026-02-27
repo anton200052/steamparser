@@ -72,6 +72,7 @@ public class PageAnalyser {
     private ProfitableListing getIfProfitableFloatListing(Listing listing, PricedItem item) {
         FloatModule floatModule = item.getFloatModule();
         BigDecimal floatVal = listing.getFloatValue();
+        System.out.println(listing.getFloatValue());
 
         if (floatVal.compareTo(floatModule.getMinFloat()) >= 0 && floatVal.compareTo(floatModule.getMaxFloat()) <= 0) {
             return new ProfitableListing(listing.getListingId(), listing.getHashName(), listing.getPrice(), listing.getStickers(), listing.getFloatValue(), listing.getPattern(), listing.getImgUrl(), ProfitableListingType.FLOAT);

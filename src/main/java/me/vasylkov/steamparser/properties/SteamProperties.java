@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "steam")
-public class SteamProperties
-{
+public class SteamProperties {
     private CurrencyCode currencyCode;
 }

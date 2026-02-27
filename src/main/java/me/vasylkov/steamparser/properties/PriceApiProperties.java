@@ -7,8 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "priceapi")
-public class PriceApiProperties
-{
+public class PriceApiProperties {
     private int itemPriceFetcherDelay;
     private String url;
 }

@@ -9,8 +9,7 @@ import java.util.List;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "parsing")
-public class ParsingProperties
-{
+public class ParsingProperties {
     private boolean cycle;
     private int threads;
     private boolean enableProxy;

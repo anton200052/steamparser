@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.web_controller.controller;
+package me.vasylkov.steamparser.user_interface.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

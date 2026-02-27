@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class StringToProxyConnectionConverter implements Converter<String, ClientConnection> {
+public class  StringToProxyConnectionConverter implements Converter<String, ClientConnection> {
     private final ProxyValidator proxyValidator;
     private final ProxyConnectionFactory proxyFactory;
 
@@ -23,18 +23,22 @@ public class StringToProxyConnectionConverter implements Converter<String, Clien
             return null;
         }
 
-        String[] parts = source.split("@");
-        String[] ipAndPort = parts[0].split(":");
+        int atIndex = source.indexOf('@');
+        String hostPort = (proxyType == ProxyType.DEFAULT) ? source : source.substring(0, atIndex);
 
-        String address = ipAndPort[0];
-        int port = Integer.parseInt(ipAndPort[1]);
+        int colonIndexHost = hostPort.indexOf(':');
+        String address = hostPort.substring(0, colonIndexHost);
+        int port = Integer.parseInt(hostPort.substring(colonIndexHost + 1));
 
         ClientConnection proxy;
         if (proxyType == ProxyType.DEFAULT) {
             proxy = proxyFactory.createDefaultProxy(address, port);
         } else {
-            String[] usernameAndPassword = parts[1].split(":");
-            proxy = proxyFactory.createAuthProxy(address, port, usernameAndPassword[0], usernameAndPassword[1]);
+            String credentials = source.substring(atIndex + 1);
+            int colonIndexCreds = credentials.indexOf(':');
+            String username = credentials.substring(0, colonIndexCreds);
+            String password = credentials.substring(colonIndexCreds + 1);
+            proxy = proxyFactory.createAuthProxy(address, port, username, password);
         }
         return proxy;
     }

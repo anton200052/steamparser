@@ -37,7 +37,7 @@ public class ItemQueueManager {
             double avgItemPrice = steamItemPriceFetcher.fetchItemAveragePrice(urlGenerator.generatePriceOverviewApiUrl(original.getHashName()));
 
             if (avgItemPrice > 0.0) {
-                PricedItem pricedItem = new PricedItem(original.getHashName(), original.getMaximalPage(), original.getStickersModule(), avgItemPrice, true);
+                PricedItem pricedItem = new PricedItem(original.getHashName(), original.getMaximalPage(), avgItemPrice, true, original.getStickersModule(), original.getFloatModule(), original.getPatternModule());
                 itemsQueue.add(pricedItem);
             } else {
                 log.warn("Не удалось получить цену для {} – пропускаем на текущую сессию",

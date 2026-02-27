@@ -11,8 +11,8 @@ public class PricedItem extends Item {
     private Double averagePrice;
     private Boolean available = true;
 
-    public PricedItem(String hashName, Integer maximalPage, StickersModule stickersModule, Double averagePrice, Boolean available) {
-        super(hashName, maximalPage, stickersModule, null, null);
+    public PricedItem(String hashName, Integer maximalPage, Double averagePrice, Boolean available, StickersModule stickersModule, FloatModule floatModule, PatternModule patternModule) {
+        super(hashName, maximalPage, stickersModule, floatModule, patternModule);
         this.averagePrice = averagePrice;
         this.available = available;
     }

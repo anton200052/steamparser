@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.web_controller.controller;
+package me.vasylkov.steamparser.user_interface.controller;
 
 import lombok.RequiredArgsConstructor;
 import me.vasylkov.steamparser.parsing.component.ParsingStatus;

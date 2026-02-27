@@ -1,4 +1,4 @@
-package me.vasylkov.steamparser.web_controller.exception_handler;
+package me.vasylkov.steamparser.user_interface.exception_handler;
 
 import me.vasylkov.steamparser.parsing.exception.ParsingRunningException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
